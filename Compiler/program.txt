@@ -1,0 +1,14 @@
+SUBROUTINE MAXCOL(A,N,LARGE,VALUE)
+    DOUBLE PRECISION VALUE(N), A(N,N)
+    INTEGER N, LARGE(N)
+    DO I = 1, N 
+        LARGE(I) = 1
+        VALUE(I) = DABS(A(1,I))
+        DO J = 2, N 
+            IF (DABS(A(J,I).GT.VALUE(I)))
+                VALUE(I) = DABS(A(J,I))
+                LARGE(I) = J 
+            ENDIF
+        ENDDO
+    ENDDO
+END
