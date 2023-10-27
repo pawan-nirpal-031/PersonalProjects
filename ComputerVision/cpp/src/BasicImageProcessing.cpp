@@ -222,7 +222,7 @@ void horizontalEdgeFilterTransform(Mat &img) {
 // of the image location. Convolution (denoted by * opreator) is commutative a*b
 // = b*a ( no diff btwn filter and signal/img) a*(b*c) = (a*b)*c helps in
 // precomputations and reducing computation time, scalar : ka*b = a*kb =
-// k*(a*b),Identity :
+// k*(a*b),Identity : Unit impulse. An important optimization uses property of seperablity usually for image of size nxn, and a filter size of k (usually 3) we require k^2 x n^2 computatations over the entire image, making it very expensive, seperablity allows us in some cases to bring this computation down to (2k * n^2) by performing 1d horizontal convolution followd by 1d vertial convolution having the same effect as the k^2 computations per pixel at end.
 void convolution(Mat &img) {}
 
 int main() {
