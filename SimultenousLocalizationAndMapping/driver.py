@@ -1,4 +1,5 @@
 import cv2
+import numpy as np
 
 H = 2160//4
 W = 3840//4 
@@ -15,7 +16,7 @@ class featureExtracter(object):
     def __init__(self):
         self.orb = cv2.ORB_create()
 
-    def extract(self,img):
+    def extractBasic(self,img):
         y = img.shape[0]
         x = img.shape[1]
         sy = y//self.gy
@@ -33,13 +34,16 @@ class featureExtracter(object):
                     absKeyPoints.append(p)
         return absKeyPoints
     
+    def extractFast(self,img):
+        features =  cv2.goodFeaturesToTrack(np.mean(img,axis=2).astype(np.uint8),3000,qualityLevel=0.01,minDistance=3)
+        self.orb.compute(img,features)
 
 fe = featureExtracter()
 def processFrame(img):
     img = cv2.resize(img,(W,H))
-    imgKeyPoints = fe.extract(img)
+    imgKeyPoints = fe.extractFast(img)
     for pt in imgKeyPoints:
-        u,v = map(lambda x:int(round(x)),pt.pt)
+        u,v = map(lambda x:int(round(x)),pt[0])
         cv2.circle(img,(u,v),color=(0,255,0),radius=3)
     display(img)
    
