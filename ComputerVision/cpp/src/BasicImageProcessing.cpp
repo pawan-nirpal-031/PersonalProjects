@@ -209,6 +209,27 @@ void horizontalEdgeFilterTransform(Mat &img) {
   }
   displayImage(transformed);
 }
+
+void medianFilter(Mat &img) {
+  displayImage(img);
+  int filtSize = 3;
+  int trows = img.rows - filtSize + 1;
+  int tcols = img.cols - filtSize + 1;
+  Mat transformed(trows, tcols, IMREAD_GRAYSCALE);
+  for (int i = 1; i <= trows - 2; i++) {
+    for (int j = 1; j <= tcols - 2; j++) {
+      vector<int> median;
+      for (int x = -1; x <= 1; x++) {
+        for (int y = -1; y <= 1; y++) {
+          median.push_back(static_cast<int>(img.at<u_char>(i + x, j + y)));
+        }
+      }
+      sort(median.begin(), median.end());
+      transformed.at<u_char>(i, j) = static_cast<u_char>(median[4]);
+    }
+  }
+  displayImage(transformed);
+}
 // Impulse signal double flips on filter application. Convolution nullifies this
 // double flip.  T(i,j)= $u$v (H(u,v)*I(i-u,j-u))  where $ is summation opreator
 // T is the transformed image, H is the filter, and I is the input image. So
@@ -222,15 +243,20 @@ void horizontalEdgeFilterTransform(Mat &img) {
 // of the image location. Convolution (denoted by * opreator) is commutative a*b
 // = b*a ( no diff btwn filter and signal/img) a*(b*c) = (a*b)*c helps in
 // precomputations and reducing computation time, scalar : ka*b = a*kb =
-// k*(a*b),Identity : Unit impulse. An important optimization uses property of seperablity usually for image of size nxn, and a filter size of k (usually 3) we require k^2 x n^2 computatations over the entire image, making it very expensive, seperablity allows us in some cases to bring this computation down to (2k * n^2) by performing 1d horizontal convolution followd by 1d vertial convolution having the same effect as the k^2 computations per pixel at end.
+// k*(a*b),Identity : Unit impulse. An important optimization uses property of
+// seperablity usually for image of size nxn, and a filter size of k (usually 3)
+// we require k^2 x n^2 computatations over the entire image, making it very
+// expensive, seperablity allows us in some cases to bring this computation down
+// to (2k * n^2) by performing 1d horizontal convolution followd by 1d vertial
+// convolution having the same effect as the k^2 computations per pixel at end.
 void convolution(Mat &img) {}
 
 int main() {
   string imPath =
-      "/home/panirpal/workspace/Projects/ComputerVision/data/frm.png";
+      "/home/panirpal/workspace/Projects/ComputerVision/data/saltpepper.png";
   Mat img = imread(imPath, IMREAD_GRAYSCALE);
   if (!img.empty())
-    verticalEdgeFilterTransform(img);
+    medianFilter(img);
   else
     cerr << "image not found! exiting...";
   return 0;
