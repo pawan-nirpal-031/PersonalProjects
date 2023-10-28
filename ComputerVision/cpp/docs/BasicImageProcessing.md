@@ -18,3 +18,5 @@
                       [1 2 1 ] ]
                 = v = h = 1/4 [1 2 1 ]
     to check if a given filter is separable check if it can be checked by K = DU Singular value decomposition. 
+    
+    * When doing convolution we lose out on border information, to mitigate that we can perform padding, a naive padding would be 0 padding. 
