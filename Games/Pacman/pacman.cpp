@@ -164,7 +164,7 @@ public:
     void resetPac(GameBoard &board, pair<unsigned,unsigned> position){
         unsigned rowu = position.first;
         unsigned colu = position.second;
-        assert((rowu>=0 and rowu<board.getRows()) and (colu>=0 and colu<board.getCols()) and "Invalid Initialization of Pacman...\n");
+        assert((rowu>=0 and rowu<board.getRows()) and (colu>=0 and colu<board.getCols()) and "Invalid Initialization of Pacman, check location...\n");
         row = rowu;
         col = colu;
         board.updateCell(row,col,cellType::PacmanT);
@@ -196,7 +196,7 @@ public:
     void resetGhost(GameBoard &board, pair<unsigned,unsigned> position){
         unsigned rowu = position.first;
         unsigned colu = position.second;
-        assert((rowu>=0 and rowu<board.getRows()) and (colu>=0 and colu<board.getCols()) and "Invalid Initialization of Ghost...\n");
+        assert((rowu>=0 and rowu<board.getRows()) and (colu>=0 and colu<board.getCols()) and "Invalid Initialization of Ghost, check location...\n");
         row = position.first;
         col = position.second;
         board.updateCell(row,col,cellType::GhostT);
@@ -213,6 +213,7 @@ public:
     Pellet(int row,int col, PelletType pty){
         this->row = row;
         this->col = col;
+        this->pty = pty;
     }
 
     pair<unsigned,unsigned> getPostion() const{
@@ -227,7 +228,10 @@ public:
 
     }
 
-    void reset(pair<unsigned,unsigned> position, PelletType pty){
+    void reset(GameBoard &board, pair<unsigned,unsigned> position, PelletType pty){
+        unsigned rowu = position.first;
+        unsigned colu = position.second;
+        assert((rowu>=0 and rowu<board.getRows()) and (colu>=0 and colu<board.getCols()) and "Invalid Initialization of Pellet, check location...\n");
         row = position.first;
         col = position.second;
         this->pty = pty;
