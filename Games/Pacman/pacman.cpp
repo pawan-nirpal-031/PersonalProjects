@@ -1,6 +1,17 @@
 #include <iostream>
 #include <vector>
 #include <assert.h>
+#include <chrono>
+#include <cstdio>
+#include <future>
+#include <thread>
+#ifdef _WIN32
+#include <conio.h>
+#elif __linux__
+#include <termios.h>
+#include <unistd.h>
+#endif
+
 using namespace std;
 
 enum cellType{
@@ -112,6 +123,14 @@ private:
     int row;
     int col;
     int score;
+
+    // Used for non blocking IO.
+    static string getInput(){
+        string inp;
+        cin>>inp;
+        return inp;
+    }
+
 public:
     Pacman(int strow,int stcol){
         row = strow;
@@ -131,10 +150,21 @@ public:
         // TODO
     }
 
-    void userInput(){
-        char input;
-        cin>>input;
-
+    void getUserInputAndProcess(){
+        std::chrono::seconds timeout(5);
+        std::string answer; //default to maybe
+        std::future<std::string> future = std::async(getInput);
+        if (future.wait_for(timeout) == std::future_status::ready)
+            answer = future.get();
+        char input = ' ';
+        if(answer=="w" or answer=="W")
+            input = 'w';
+        else if(answer=="s" or answer=="S")
+            input = 's';
+        else if(answer=="d" or answer=="D")
+            input = 'd';
+        else if(answer=="a" or answer=="A")
+            input = 'a';
         switch(input){
             case 'w': {
                 move(Direction::Up);
@@ -238,35 +268,161 @@ public:
     }
 };
 
-void initalizeGameSimplestPolicy(){
-    GameBoard board(6,6);
-    for(int i =0;i<6;i++){
-        board.updateCell(0,i,cellType::WallT);
-        board.updateCell(5,i,cellType::WallT);
-        board.updateCell(i,0,cellType::WallT);
-        board.updateCell(i,5,cellType::WallT);
-    }
-    board.updateCell(2,2,cellType::WallT);
-    board.updateCell(2,3,cellType::WallT);
-    board.updateCell(3,2,cellType::WallT);
-    board.updateCell(3,3,cellType::WallT);
-    board.updateCell(1,1,cellType::PelletT);
-    board.updateCell(1,4,cellType::PelletT);
-    board.updateCell(4,1,cellType::PelletT);
-    board.updateCell(4,4,cellType::PelletT);
-    Pacman pac(1,2);
-    pac.resetPac(board,pac.getPostion());
-    board.updateCell(2,1,cellType::GhostT);
-    board.updateCell(3,4,cellType::GhostT);
-    for(int i =0;i<6;i++){
-        for(int j =0;j<6;j++)
-            if(board.getEntityAt(i,j)==cellType::EmptyT)
-                board.updateCell(i,j,cellType::PelletT);
-    }
-    board.renderBoard();
-}
+class Game{
+private:
+    GameBoard board;
+    GameState state;
+    Pacman pac;
+    Ghost g1;
+    Ghost g2;
 
+    void setNonBlocking() {
+    #ifdef _WIN32
+        _setmode(_fileno(stdin), _O_TEXT);
+    #elif __linux__
+        struct termios ttystate;
+        tcgetattr(STDIN_FILENO, &ttystate);
+        ttystate.c_lflag &= ~(ICANON | ECHO);
+        ttystate.c_cc[VMIN] = 0;
+        ttystate.c_cc[VTIME] = 0;
+        tcsetattr(STDIN_FILENO, TCSANOW, &ttystate);
+    #endif
+    }
+
+    // Function to restore blocking mode for standard input
+    void restoreBlocking() {
+    #ifdef _WIN32
+        _setmode(_fileno(stdin), _O_TEXT);
+    #elif __linux__
+        struct termios ttystate;
+        tcgetattr(STDIN_FILENO, &ttystate);
+        ttystate.c_lflag |= ICANON | ECHO;
+        tcsetattr(STDIN_FILENO, TCSANOW, &ttystate);
+    #endif
+    }
+
+    // Function to check if a key is pressed
+    bool keyIsPressed() {
+    #ifdef _WIN32
+        return _kbhit() != 0;
+    #elif __linux__
+        fd_set fds;
+        struct timeval timeout;
+        FD_ZERO(&fds);
+        FD_SET(STDIN_FILENO, &fds);
+        timeout.tv_sec = 0;
+        timeout.tv_usec = 0;
+        return select(STDIN_FILENO + 1, &fds, NULL, NULL, &timeout) == 1;
+    #endif
+    }
+
+    // Function to get a non-blocking key press
+    char getKeyPress() {
+        char ch = '\0';
+        if (keyIsPressed()) {
+            cin >> ch;
+        }
+        return ch;
+    }
+
+public:
+    Game() : board(6,6), state(board), pac(1,2), g1(2,1), g2(3,4)  {
+        initalizeGameSimplestPolicy();
+    }
+
+    void initalizeGameSimplestPolicy(){
+        GameBoard board(6,6);
+        for(int i =0;i<6;i++){
+            board.updateCell(0,i,cellType::WallT);
+            board.updateCell(5,i,cellType::WallT);
+            board.updateCell(i,0,cellType::WallT);
+            board.updateCell(i,5,cellType::WallT);
+        }
+        board.updateCell(2,2,cellType::WallT);
+        board.updateCell(2,3,cellType::WallT);
+        board.updateCell(3,2,cellType::WallT);
+        board.updateCell(3,3,cellType::WallT);
+        board.updateCell(1,1,cellType::PelletT);
+        board.updateCell(1,4,cellType::PelletT);
+        board.updateCell(4,1,cellType::PelletT);
+        board.updateCell(4,4,cellType::PelletT);
+        Pacman pac(1,2);
+        pac.resetPac(board,pac.getPostion());
+        board.updateCell(2,1,cellType::GhostT);
+        board.updateCell(3,4,cellType::GhostT);
+        for(int i =0;i<6;i++){
+            for(int j =0;j<6;j++)
+                if(board.getEntityAt(i,j)==cellType::EmptyT)
+                    board.updateCell(i,j,cellType::PelletT);
+        }
+        board.renderBoard();
+    }
+
+    void getAndProcessInputClassic(){
+        pac.getUserInputAndProcess();
+    }
+
+    void getAndProcessInput(){
+        char input = getKeyPress();
+        switch(input){
+            case 'w': {
+                pac.move(Direction::Up);
+                break;
+            }
+
+            case 's': {
+                pac.move(Direction::Down);
+                break;
+            }
+
+            case 'd': {
+                pac.move(Direction::Right);
+                break;
+            }
+
+            case 'a': {
+                pac.move(Direction::Left);
+                break;
+            }
+
+            default:
+                assert("unsupported action");
+        }
+    }
+
+    void updateGameState(){
+        state.renderGameState();
+    }
+
+    void render(){
+        #ifdef _WIN32
+            system("cls");
+        #elif __linux__
+            system("clear");
+        #endif
+        // TODO : Add rendering of score, lives left.
+        state.renderGameState();
+    }
+
+    void runGame(){
+        // setNonBlocking();
+        int devBreak = 0;
+        while(true){
+            getAndProcessInputClassic();
+            updateGameState();
+            render();
+            devBreak++;
+            // dev break cycle till the exit logic comes
+            if(devBreak==500)
+                break;
+            this_thread::sleep_for(chrono::microseconds(100));
+        }
+        // restoreBlocking();
+    }
+
+};
 
 int main(){
-   initalizeGameSimplestPolicy();
+    Game g;
+    g.runGame();
 }
