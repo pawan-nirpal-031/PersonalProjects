@@ -120,15 +120,85 @@ public:
 
 class Pacman{
 private:
-    int row;
-    int col;
-    int score;
+    unsigned row;
+    unsigned col;
+    unsigned score;
+    // Default number of lives
+    unsigned lives = 3;
+    bool isAlive = true;
 
     // Used for non blocking IO.
     static string getInput(){
         string inp;
         cin>>inp;
         return inp;
+    }
+
+    void updatePosition(int urow,int ucol) {
+        this->row = urow;
+        this->col = ucol;
+    }
+
+    bool pacLifeStatus(){
+        return (isAlive && lives>=1);
+    }
+
+    // A kill request raised when paccy has ran into a ghost or a ghost hunted down the Pac.
+    void killPacman(){
+        assert(lives>=1 && "Cannot be killed without a life...\n");
+        if(lives==1){
+            lives = 0;
+            isAlive = false;
+            cout<<"GAME OVER :(";
+            exit(0);
+        }else{
+            // Giving it another life.
+            lives-=1;
+            isAlive = true;
+        }
+    }
+
+    void handleUpMovement(GameBoard &board){
+        assert(pacLifeStatus() && "Pac not live...\n");
+        pair<unsigned,unsigned> currPos = getPostion();
+        int currRow = currPos.first;
+        int currCol = currPos.second;
+        if(currRow==0)
+            return;
+        char entity = board.getEntityAt(currRow-1,currCol);
+        switch(entity){
+            // Just move up.
+            case(cellType::EmptyT):{
+                currRow-=1;
+                updatePosition(currRow,currCol);
+                break;
+            }
+            
+            case(cellType::GhostT):{
+                // TODO : Kill Pac and exit the game. Make this more sophisticated.
+                killPacman();
+                break;
+            }
+            // consume pellet
+            case(cellType::PelletT):{
+                score+=1;
+                currRow-=1;
+                updatePosition(currRow,currCol);
+                break;
+            }
+            // Consume power pellet.
+            case(cellType::PowerPelletT):{
+                score+=50;
+                currRow-=1;
+                updatePosition(currRow,currCol);
+                break;
+            }
+            //  Nothing happens
+            case(cellType::WallT):{
+                break;
+            }
+            assert("Unexpected request for up movement of pac...\n");
+        }
     }
 
 public:
@@ -146,11 +216,28 @@ public:
         return score;
     }
 
-    void move(Direction direction){
-        // TODO
+    void move(Direction direction, GameBoard &board){
+        switch(direction){
+            case(Direction::Up):{
+                handleUpMovement(board);
+                break;
+            }
+            case(Direction::Down):{
+                
+                break;
+            }
+            case(Direction::Left):{
+                
+                break;
+            }
+            case(Direction::Right):{
+                
+                break;
+            }
+        }
     }
 
-    void getUserInputAndProcess(){
+    void getUserInputAndProcess(GameBoard &board){
         std::chrono::seconds timeout(5);
         std::string answer; //default to maybe
         std::future<std::string> future = std::async(getInput);
@@ -167,27 +254,27 @@ public:
             input = 'a';
         switch(input){
             case 'w': {
-                move(Direction::Up);
+                move(Direction::Up,board);
                 break;
             }
 
             case 's': {
-                move(Direction::Down);
+                move(Direction::Down,board);
                 break;
             }
 
             case 'd': {
-                move(Direction::Right);
+                move(Direction::Right,board);
                 break;
             }
 
             case 'a': {
-                move(Direction::Left);
+                move(Direction::Left,board);
                 break;
             }
 
             default:
-                assert("unsupported action");
+                cout<<("unsupported action please enter valid direction...")<<"\n";
         }
     }
 
@@ -359,29 +446,29 @@ public:
     }
 
     void getAndProcessInputClassic(){
-        pac.getUserInputAndProcess();
+        pac.getUserInputAndProcess(board);
     }
 
     void getAndProcessInput(){
         char input = getKeyPress();
         switch(input){
             case 'w': {
-                pac.move(Direction::Up);
+                pac.move(Direction::Up,board);
                 break;
             }
 
             case 's': {
-                pac.move(Direction::Down);
+                pac.move(Direction::Down,board);
                 break;
             }
 
             case 'd': {
-                pac.move(Direction::Right);
+                pac.move(Direction::Right,board);
                 break;
             }
 
             case 'a': {
-                pac.move(Direction::Left);
+                pac.move(Direction::Left,board);
                 break;
             }
 
@@ -391,7 +478,7 @@ public:
     }
 
     void updateGameState(){
-        state.renderGameState();
+
     }
 
     void render(){
