@@ -11,6 +11,7 @@
 #include <termios.h>
 #include <unistd.h>
 #endif
+#define DEBUG true
 
 using namespace std;
 
@@ -35,6 +36,13 @@ enum class Direction{
     Right
 };
 
+// Forward delcn.
+class GameState;
+class GameBoard;
+class Pacman;
+class Ghost;
+class Pellet;
+class Game;
 class GameBoard{
 private:
     int rows;
@@ -101,19 +109,26 @@ public:
 
 };
 
+// The GameState represents the current game context, it encompasses Board, the Pacman and the ghosts. 
+// Control the core game logic from this game state and also render the board. The Board does not have objects on it, it only has textual representation of the enity/object like Pac or ghost or pellet. 
 class GameState{
 private:
-    GameBoard board;
 public:
-    GameState(const GameBoard &gboard) : board(gboard) {}
+    GameBoard board;
+    bool isPacLive = true;
+    Pacman *pac;
+    vector<Ghost> ghosts;
+
+    GameState(GameBoard gboard, Pacman *spac, vector<Ghost>sghosts) : board(gboard), pac(spac), ghosts(sghosts) {}
     
-    void renderGameState() const {
-        board.renderBoard();
+    void renderGameState() {
+        this->board.renderBoard();
+        cout<<"\n\n\n";
     }
 
     // TODO
     void updateGameState(){
-
+        //this->renderGameState();
     }
 
 };
@@ -126,13 +141,6 @@ private:
     // Default number of lives
     unsigned lives = 3;
     bool isAlive = true;
-
-    // Used for non blocking IO.
-    static string getInput(){
-        string inp;
-        cin>>inp;
-        return inp;
-    }
 
     void updatePosition(int urow,int ucol) {
         this->row = urow;
@@ -170,6 +178,8 @@ private:
             // Just move up.
             case(cellType::EmptyT):{
                 currRow-=1;
+                board.updateCell(currRow,currCol,cellType::PacmanT);
+                board.updateCell(currRow+1,currCol,cellType::EmptyT);
                 updatePosition(currRow,currCol);
                 break;
             }
@@ -183,6 +193,8 @@ private:
             case(cellType::PelletT):{
                 score+=1;
                 currRow-=1;
+                board.updateCell(currRow,currCol,cellType::PacmanT);
+                board.updateCell(currRow+1,currCol,cellType::EmptyT);
                 updatePosition(currRow,currCol);
                 break;
             }
@@ -190,6 +202,156 @@ private:
             case(cellType::PowerPelletT):{
                 score+=50;
                 currRow-=1;
+                board.updateCell(currRow,currCol,cellType::PacmanT);
+                board.updateCell(currRow+1,currCol,cellType::EmptyT);
+                updatePosition(currRow,currCol);
+                break;
+            }
+            //  Nothing happens
+            case(cellType::WallT):{
+                break;
+            }
+            assert("Unexpected request for up movement of pac...\n");
+        }
+    }
+
+    void handleDownMovement(GameBoard &board){
+        assert(pacLifeStatus() && "Pac not live...\n");
+        pair<unsigned,unsigned> currPos = getPostion();
+        int currRow = currPos.first;
+        int currCol = currPos.second;
+        // Cannot move down from the last row. TODO : can interpass from last to first row, if valid.
+        if(currRow==board.getRows()-1)
+            return;
+        char entity = board.getEntityAt(currRow+1,currCol);
+        switch(entity){
+            // Just move up.
+            case(cellType::EmptyT):{
+                currRow+=1;
+                board.updateCell(currRow,currCol,cellType::PacmanT);
+                board.updateCell(currRow-1,currCol,cellType::EmptyT);
+                updatePosition(currRow,currCol);
+                break;
+            }
+            
+            case(cellType::GhostT):{
+                // TODO : Kill Pac and exit the game. Make this more sophisticated.
+                killPacman();
+                break;
+            }
+            // consume pellet
+            case(cellType::PelletT):{
+                score+=1;
+                currRow+=1;
+                board.updateCell(currRow,currCol,cellType::PacmanT);
+                board.updateCell(currRow-1,currCol,cellType::EmptyT);
+                updatePosition(currRow,currCol);
+                break;
+            }
+            // Consume power pellet.
+            case(cellType::PowerPelletT):{
+                score+=50;
+                currRow+=1;
+                board.updateCell(currRow,currCol,cellType::PacmanT);
+                board.updateCell(currRow-1,currCol,cellType::EmptyT);
+                updatePosition(currRow,currCol);
+                break;
+            }
+            //  Nothing happens
+            case(cellType::WallT):{
+                break;
+            }
+            assert("Unexpected request for up movement of pac...\n");
+        }
+    }
+
+    void handleLeftMovement(GameBoard &board){
+        assert(pacLifeStatus() && "Pac not live...\n");
+        pair<unsigned,unsigned> currPos = getPostion();
+        int currRow = currPos.first;
+        int currCol = currPos.second;
+        // already at first col cannot move furthur leftwards
+        if(currCol==0)
+            return;
+        char entity = board.getEntityAt(currCol-1,currRow);
+        switch(entity){
+            case(cellType::EmptyT):{
+                currCol-=1;
+                board.updateCell(currRow,currCol,cellType::PacmanT);
+                board.updateCell(currRow,currCol+1,cellType::EmptyT);
+                updatePosition(currRow,currCol);
+                break;
+            }
+            
+            case(cellType::GhostT):{
+                // TODO : Kill Pac and exit the game. Make this more sophisticated.
+                killPacman();
+                break;
+            }
+            // consume pellet
+            case(cellType::PelletT):{
+                score+=1;
+                currCol-=1;
+                board.updateCell(currRow,currCol,cellType::PacmanT);
+                board.updateCell(currRow,currCol+1,cellType::EmptyT);
+                updatePosition(currRow,currCol);
+                break;
+            }
+            // Consume power pellet.
+            case(cellType::PowerPelletT):{
+                score+=50;
+                currCol-=1;
+                board.updateCell(currRow,currCol,cellType::PacmanT);
+                board.updateCell(currRow,currCol+1,cellType::EmptyT);
+                updatePosition(currRow,currCol);
+                break;
+            }
+            //  Nothing happens
+            case(cellType::WallT):{
+                break;
+            }
+            assert("Unexpected request for up movement of pac...\n");
+        }
+    }
+
+    void handleRightMovement(GameBoard &board){
+        assert(pacLifeStatus() && "Pac not live...\n");
+        pair<unsigned,unsigned> currPos = getPostion();
+        int currRow = currPos.first;
+        int currCol = currPos.second;
+        // already at last col cannot move furthur rightwards
+        if(currCol==board.getCols())
+            return;
+        char entity = board.getEntityAt(currCol+1,currRow);
+        switch(entity){
+            case(cellType::EmptyT):{
+                currCol+=1;
+                board.updateCell(currRow,currCol,cellType::PacmanT);
+                board.updateCell(currRow,currCol-1,cellType::EmptyT);
+                updatePosition(currRow,currCol);
+                break;
+            }
+            
+            case(cellType::GhostT):{
+                // TODO : Kill Pac and exit the game. Make this more sophisticated.
+                killPacman();
+                break;
+            }
+            // consume pellet
+            case(cellType::PelletT):{
+                score+=1;
+                currCol+=1;
+                board.updateCell(currRow,currCol,cellType::PacmanT);
+                board.updateCell(currRow,currCol-1,cellType::EmptyT);
+                updatePosition(currRow,currCol);
+                break;
+            }
+            // Consume power pellet.
+            case(cellType::PowerPelletT):{
+                score+=50;
+                currCol+=1;
+                board.updateCell(currRow,currCol,cellType::PacmanT);
+                board.updateCell(currRow,currCol-1,cellType::EmptyT);
                 updatePosition(currRow,currCol);
                 break;
             }
@@ -216,65 +378,25 @@ public:
         return score;
     }
 
-    void move(Direction direction, GameBoard &board){
+    // Pass GameState as the GameContext and let this Object flow through code as a base context.
+    void move(Direction direction, GameState state){
         switch(direction){
             case(Direction::Up):{
-                handleUpMovement(board);
+                handleUpMovement(state.board);
                 break;
             }
             case(Direction::Down):{
-                
+                handleDownMovement(state.board);
                 break;
             }
             case(Direction::Left):{
-                
+                handleLeftMovement(state.board);
                 break;
             }
             case(Direction::Right):{
-                
+                handleRightMovement(state.board);
                 break;
             }
-        }
-    }
-
-    void getUserInputAndProcess(GameBoard &board){
-        std::chrono::seconds timeout(5);
-        std::string answer; //default to maybe
-        std::future<std::string> future = std::async(getInput);
-        if (future.wait_for(timeout) == std::future_status::ready)
-            answer = future.get();
-        char input = ' ';
-        if(answer=="w" or answer=="W")
-            input = 'w';
-        else if(answer=="s" or answer=="S")
-            input = 's';
-        else if(answer=="d" or answer=="D")
-            input = 'd';
-        else if(answer=="a" or answer=="A")
-            input = 'a';
-        switch(input){
-            case 'w': {
-                move(Direction::Up,board);
-                break;
-            }
-
-            case 's': {
-                move(Direction::Down,board);
-                break;
-            }
-
-            case 'd': {
-                move(Direction::Right,board);
-                break;
-            }
-
-            case 'a': {
-                move(Direction::Left,board);
-                break;
-            }
-
-            default:
-                cout<<("unsupported action please enter valid direction...")<<"\n";
         }
     }
 
@@ -296,6 +418,16 @@ class Ghost{
 private:
     int row;
     int col;
+
+    void resetGhost(GameBoard &board, pair<unsigned,unsigned> position){
+        unsigned rowu = position.first;
+        unsigned colu = position.second;
+        assert((rowu>=0 and rowu<board.getRows()) and (colu>=0 and colu<board.getCols()) and "Invalid Initialization of Ghost, check location...\n");
+        row = position.first;
+        col = position.second;
+        board.updateCell(row,col,cellType::GhostT);
+    }
+
 public:
     Ghost(int srow,int scol){
         row = srow;
@@ -308,15 +440,6 @@ public:
 
     void updatePosition(){
 
-    }
-
-    void resetGhost(GameBoard &board, pair<unsigned,unsigned> position){
-        unsigned rowu = position.first;
-        unsigned colu = position.second;
-        assert((rowu>=0 and rowu<board.getRows()) and (colu>=0 and colu<board.getCols()) and "Invalid Initialization of Ghost, check location...\n");
-        row = position.first;
-        col = position.second;
-        board.updateCell(row,col,cellType::GhostT);
     }
 };
 
@@ -340,29 +463,13 @@ public:
     PelletType getType() const {
         return pty;
     }
-
-    void consume(){
-
-    }
-
-    void reset(GameBoard &board, pair<unsigned,unsigned> position, PelletType pty){
-        unsigned rowu = position.first;
-        unsigned colu = position.second;
-        assert((rowu>=0 and rowu<board.getRows()) and (colu>=0 and colu<board.getCols()) and "Invalid Initialization of Pellet, check location...\n");
-        row = position.first;
-        col = position.second;
-        this->pty = pty;
-    }
 };
 
+/// @brief A Game only has a game state and ability to update it, Initalize it. 
 class Game{
 private:
-    GameBoard board;
-    GameState state;
-    Pacman pac;
-    Ghost g1;
-    Ghost g2;
-
+    GameState *state;
+    
     void setNonBlocking() {
     #ifdef _WIN32
         _setmode(_fileno(stdin), _O_TEXT);
@@ -412,13 +519,40 @@ private:
         return ch;
     }
 
+    // Used for non blocking IO.
+    static string getInput(){
+        string inp;
+        cin>>inp;
+        return inp;
+    }
+
+    char getUserInput(){
+        std::chrono::seconds timeout(5);
+        std::string answer; //default to maybe
+        std::future<std::string> future = std::async(getInput);
+        if (future.wait_for(timeout) == std::future_status::ready)
+            answer = future.get();
+        char input = ' ';
+        if(answer=="w" or answer=="W")
+            return 'w';
+        else if(answer=="s" or answer=="S")
+            return 's';
+        else if(answer=="d" or answer=="D")
+            return 'd';
+        else if(answer=="a" or answer=="A")
+            return 'a';
+        cout<<"Please enter valid movement...\n";
+        return input;
+    }
+
+
 public:
-    Game() : board(6,6), state(board), pac(1,2), g1(2,1), g2(3,4)  {
-        initalizeGameSimplestPolicy();
+    Game(GameState *sstate){
+        state = sstate;
     }
 
     void initalizeGameSimplestPolicy(){
-        GameBoard board(6,6);
+        GameBoard &board = state->board;
         for(int i =0;i<6;i++){
             board.updateCell(0,i,cellType::WallT);
             board.updateCell(5,i,cellType::WallT);
@@ -433,8 +567,8 @@ public:
         board.updateCell(1,4,cellType::PelletT);
         board.updateCell(4,1,cellType::PelletT);
         board.updateCell(4,4,cellType::PelletT);
-        Pacman pac(1,2);
-        pac.resetPac(board,pac.getPostion());
+        Pacman *pac = state->pac;
+        pac->resetPac(board,pac->getPostion());
         board.updateCell(2,1,cellType::GhostT);
         board.updateCell(3,4,cellType::GhostT);
         for(int i =0;i<6;i++){
@@ -446,29 +580,41 @@ public:
     }
 
     void getAndProcessInputClassic(){
-        pac.getUserInputAndProcess(board);
-    }
-
-    void getAndProcessInput(){
-        char input = getKeyPress();
+        char input;
+        cin>>input;
+        #ifdef DEBUG 
+            cout<<">>> Input : "<<input<<'\n';
+        #endif
         switch(input){
             case 'w': {
-                pac.move(Direction::Up,board);
+                #ifdef DEBUG 
+                    cout<<">>> Moving Up: "<<'\n';
+                #endif
+                state->pac->move(Direction::Up,*state);
                 break;
             }
 
             case 's': {
-                pac.move(Direction::Down,board);
+                #ifdef DEBUG 
+                    cout<<">>> Moving Down: "<<'\n';
+                #endif
+                state->pac->move(Direction::Down,*state);
                 break;
             }
 
             case 'd': {
-                pac.move(Direction::Right,board);
+                #ifdef DEBUG 
+                    cout<<">>> Moving Left: "<<'\n';
+                #endif
+                state->pac->move(Direction::Right,*state);
                 break;
             }
 
             case 'a': {
-                pac.move(Direction::Left,board);
+                #ifdef DEBUG 
+                    cout<<">>> Moving Right: "<<'\n';
+                #endif
+                state->pac->move(Direction::Left,*state);
                 break;
             }
 
@@ -477,32 +623,61 @@ public:
         }
     }
 
+    // void getAndProcessInput(){
+    //     char input = getKeyPress();
+    //     switch(input){
+    //         case 'w': {
+    //             pac.move(Direction::Up,board);
+    //             break;
+    //         }
+
+    //         case 's': {
+    //             pac.move(Direction::Down,board);
+    //             break;
+    //         }
+
+    //         case 'd': {
+    //             pac.move(Direction::Right,board);
+    //             break;
+    //         }
+
+    //         case 'a': {
+    //             pac.move(Direction::Left,board);
+    //             break;
+    //         }
+
+    //         default:
+    //             assert("unsupported action");
+    //     }
+    // }
+
     void updateGameState(){
 
     }
 
     void render(){
-        #ifdef _WIN32
-            system("cls");
-        #elif __linux__
-            system("clear");
-        #endif
+        // #ifdef _WIN32
+        //     system("cls");
+        // #elif __linux__
+        //     system("clear");
+        // #endif
         // TODO : Add rendering of score, lives left.
-        state.renderGameState();
+        state->renderGameState();
     }
 
     void runGame(){
         // setNonBlocking();
+        initalizeGameSimplestPolicy();
         int devBreak = 0;
         while(true){
             getAndProcessInputClassic();
-            updateGameState();
+            state->updateGameState();
             render();
             devBreak++;
             // dev break cycle till the exit logic comes
-            if(devBreak==500)
+            if(devBreak==4)
                 break;
-            this_thread::sleep_for(chrono::microseconds(100));
+           this_thread::sleep_for(chrono::microseconds(100));
         }
         // restoreBlocking();
     }
@@ -510,6 +685,8 @@ public:
 };
 
 int main(){
-    Game g;
+    Pacman *pac = new Pacman(1,2);
+    GameState *state = new GameState(GameBoard(6,6), pac,{Ghost(2,1),Ghost(3,4)});
+    Game g(state);
     g.runGame();
 }
