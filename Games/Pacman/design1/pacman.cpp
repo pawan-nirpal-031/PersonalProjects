@@ -4,6 +4,7 @@
 #include <chrono>
 #include <cstdio>
 #include <future>
+#include <queue>
 #include <thread>
 #ifdef _WIN32
 #include <conio.h>
@@ -77,6 +78,7 @@ private:
     }
 
 public:
+    vector<pair<int,int>> Visit4Neighbours = {{0,-1},{1,0},{0,1},{-1,0}};
     GameBoard(int rows,int cols){
         hasBeenInitalized = true;
         this->rows = rows;
@@ -95,22 +97,27 @@ public:
         }
     }
 
+    bool isValidCell(int x,int y){
+        assert(hasBeenInitalized and "Board was never Initalized...\n");
+        return (x>=0 and x<rows and y>=0 and y<cols);
+    }
+
     void updateCell(int row,int col,CellType cty){
         board[row][col] = cty;
     }
 
     CellType getEntityAt(int row,int col){
-        assert(hasBeenInitalized && "Board was never Initalized...\n");
+        assert(hasBeenInitalized and "Board was never Initalized...\n");
         return board[row][col];
     }
 
     unsigned getRows(){
-        assert(hasBeenInitalized && "Board was never Initalized...\n");
+        assert(hasBeenInitalized and "Board was never Initalized...\n");
         return rows;
     }
 
     unsigned getCols(){
-        assert(hasBeenInitalized && "Board was never Initalized...\n");
+        assert(hasBeenInitalized and "Board was never Initalized...\n");
         return cols;
     }
 };
@@ -489,9 +496,51 @@ public:
         return make_pair(row,col);
     }
 
+    // Perform a bfs starting at the PAC and annotate the graph, with the Minimum distance to reach that point, if that point in maze was reachable. And this would be unique for each invocation of updation of this ghost position. 
+    void updatePositionClosestDistancePolicy(GameState *state){
+        GameBoard &board = *state->board;
+        vector<vector<unsigned long>>Distance(board.getRows(),vector<unsigned long>(board.getCols(),INT64_MAX));
+        vector<vector<bool>> Visited(board.getRows(),vector<bool>(board.getCols(),false));
+        Pacman &pac = *state->pac;
+        auto pacPos = pac.getPostion();
+        unsigned prow = pacPos.first;
+        unsigned pcol = pacPos.second;
+        Distance[prow][pcol] = 0;
+        Visited[prow][pcol] = true;
+        queue<pair<unsigned,unsigned>> Frontier;
+        Frontier.push(make_pair(prow,pcol));
+        while(not Frontier.empty()){
+            auto currNode = Frontier.front();
+            Frontier.pop();
+            for(auto &neighbour : board.Visit4Neighbours){
+                int nxtrow = currNode.first + neighbour.first;
+                int nxtcol = currNode.second + neighbour.second;
+                if(not board.isValidCell(nxtrow,nxtcol))
+                    continue;
+                CellType entity = board.getEntityAt(nxtrow,nxtcol);
+                if((not Visited[nxtrow][nxtcol]) and (entity==CellType::GhostT or entity==CellType::EmptyT or entity==CellType::PelletT or entity==CellType::PowerPelletT)){
+                    Distance[nxtrow][nxtcol] = Distance[currNode.first][currNode.second] + 1;
+                    Frontier.push(make_pair(nxtrow,nxtcol));
+                }
+            }
+            Visited[currNode.first][currNode.second] = true;
+        }
+
+        if(Visited[row][col]==false and Distance[row][col]==INT64_MAX)
+            cout<<"Ghost at : "<<row<<" , "<<col<<" is unreachable from Pac...\n";
+        else{
+            unsigned long MinDistFromPac = Distance[row][col];
+            if(MinDistFromPac<INT64_MAX){
+                
+            }else{
+                cout<<"Ghost out of reach IG...\n";
+            }
+        }
+    }
+
     // For now we decide on moving a ghost Randomly. Takes game state and exploration depth for recursive attemps.
     void updatePositionRandomPolicy(GameState *state,int &depth){
-        if(depth==0)
+        if(depth<=0)
             return;
         GameBoard &board = *state->board;
         unsigned int getDir = rand()%4;
@@ -537,7 +586,7 @@ public:
                             depth-=1;
                             updatePositionRandomPolicy(state,depth);
                             break;
-                        }   
+                        }
                     }
                 }else{
                     depth-=1;
@@ -903,11 +952,11 @@ public:
     }
 
     void render(){
-        #ifdef _WIN32
-            system("cls");
-        #elif __linux__
-            system("clear");
-        #endif
+        // #ifdef _WIN32
+        //     system("cls");
+        // #elif __linux__
+        //     system("clear");
+        // #endif
         // TODO : Add rendering of score, lives left.
         state->renderGameState();
     }
@@ -919,11 +968,10 @@ public:
         while(true and state->pac->pacLifeStatus()){
             getAndProcessInputClassic();
             state->updateGameState();
-            // for(int i =0;i<state->ghosts->size();i++){
-            //     // Number of tries per ghost
-            //     int randomPolicyUpd = 3;
-            //     state->ghosts->at(i).updatePositionRandomPolicy(state,randomPolicyUpd);
-            // }
+            for(int i =0;i<state->ghosts->size();i++){
+                // Number of tries per ghost
+                state->ghosts->at(i).updatePositionClosestDistancePolicy(state);
+            }
             render();
             devBreak++;
             // dev break cycle till the exit logic comes
@@ -933,7 +981,6 @@ public:
         }
         // restoreBlocking();
     }
-
 };
 
 int main(){
