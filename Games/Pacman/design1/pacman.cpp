@@ -11,11 +11,11 @@
 #include <termios.h>
 #include <unistd.h>
 #endif
-#define DEBUG true
+#define DEBUG false
 
 using namespace std;
 
-enum cellType{
+enum CellType{
     EmptyT,
     WallT,
     PelletT,
@@ -36,6 +36,11 @@ enum class Direction{
     Right
 };
 
+enum class Signal{
+    GameOver,
+    StartNextLife
+};
+
 // Forward delcn.
 class GameState;
 class GameBoard;
@@ -47,22 +52,22 @@ class GameBoard{
 private:
     int rows;
     int cols;
-    vector<vector<cellType>> board;
+    vector<vector<CellType>> board;
     bool hasBeenInitalized = false;
 
-    char getCellCharByCellType(cellType Cty) const {
+    char getCellCharByCellType(CellType Cty) const {
         switch (Cty){
-            case cellType::EmptyT: 
+            case CellType::EmptyT: 
                 return ' ';
-            case cellType::WallT:
+            case CellType::WallT:
                 return '#';
-            case cellType::PacmanT:
+            case CellType::PacmanT:
                 return 'P';
-            case cellType::PelletT:
+            case CellType::PelletT:
                 return '.';
-            case cellType::PowerPelletT:
+            case CellType::PowerPelletT:
                 return 'O';
-            case cellType::GhostT:
+            case CellType::GhostT:
                 return 'G';
             default:
                 assert("unknown cell type!!");
@@ -76,7 +81,7 @@ public:
         hasBeenInitalized = true;
         this->rows = rows;
         this->cols = cols;
-        board.resize(rows,vector<cellType>(cols,cellType::EmptyT));
+        board.resize(rows,vector<CellType>(cols,CellType::EmptyT));
     }
 
     void renderBoard() const {
@@ -88,11 +93,11 @@ public:
         }
     }
 
-    void updateCell(int row,int col,cellType cty){
+    void updateCell(int row,int col,CellType cty){
         board[row][col] = cty;
     }
 
-    char getEntityAt(int row,int col){
+    CellType getEntityAt(int row,int col){
         assert(hasBeenInitalized && "Board was never Initalized...\n");
         return board[row][col];
     }
@@ -106,7 +111,6 @@ public:
         assert(hasBeenInitalized && "Board was never Initalized...\n");
         return cols;
     }
-
 };
 
 // The GameState represents the current game context, it encompasses Board, the Pacman and the ghosts. 
@@ -114,22 +118,22 @@ public:
 class GameState{
 private:
 public:
-    GameBoard board;
-    bool isPacLive = true;
+    GameBoard *board;
     Pacman *pac;
-    vector<Ghost> ghosts;
+    vector<Ghost> *ghosts;
 
-    GameState(GameBoard gboard, Pacman *spac, vector<Ghost>sghosts) : board(gboard), pac(spac), ghosts(sghosts) {}
-    
-    void renderGameState() {
-        this->board.renderBoard();
-        cout<<"\n\n\n";
+   // GameState(GameBoard gboard, Pacman *spac, vector<Ghost>sghosts) : board(gboard), pac(spac), ghosts(sghosts) {}
+    GameState(GameBoard *gboard, Pacman *spac, vector<Ghost> *sghosts) {
+        ghosts = sghosts;
+        pac = spac;
+        board = gboard;
     }
+
+    
+    void renderGameState();
 
     // TODO
-    void updateGameState(){
-        //this->renderGameState();
-    }
+    void updateGameState();
 
 };
 
@@ -147,22 +151,20 @@ private:
         this->col = ucol;
     }
 
-    bool pacLifeStatus(){
-        return (isAlive && lives>=1);
-    }
-
     // A kill request raised when paccy has ran into a ghost or a ghost hunted down the Pac.
-    void killPacman(){
+    Signal killPacman(){
         assert(lives>=1 && "Cannot be killed without a life...\n");
         if(lives==1){
             lives = 0;
             isAlive = false;
-            cout<<"GAME OVER :(";
-            exit(0);
+            cout<<"GAME OVER :(\n";
+            return Signal::GameOver;
         }else{
             // Giving it another life.
             lives-=1;
-            isAlive = true;
+            isAlive = false;
+            cout<<"YOU JUST GOT KILLED STARTING OVER, LIFE : "<<lives<<"\n";
+            return Signal::StartNextLife;
         }
     }
 
@@ -173,44 +175,54 @@ private:
         int currCol = currPos.second;
         if(currRow==0)
             return;
-        char entity = board.getEntityAt(currRow-1,currCol);
+        CellType entity = board.getEntityAt(currRow-1,currCol);
         switch(entity){
             // Just move up.
-            case(cellType::EmptyT):{
+            case(CellType::EmptyT):{
                 currRow-=1;
-                board.updateCell(currRow,currCol,cellType::PacmanT);
-                board.updateCell(currRow+1,currCol,cellType::EmptyT);
+                board.updateCell(currRow,currCol,CellType::PacmanT);
+                board.updateCell(currRow+1,currCol,CellType::EmptyT);
+                updatePosition(currRow,currCol);
+                break;
+            }
+
+            //  Nothing happens
+            case(CellType::WallT):{
+                break;
+            }
+
+            // consume pellet
+            case(CellType::PelletT):{
+                score+=1;
+                currRow-=1;
+                board.updateCell(currRow,currCol,CellType::PacmanT);
+                board.updateCell(currRow+1,currCol,CellType::EmptyT);
+                updatePosition(currRow,currCol);
+                break;
+            }
+
+            // Consume power pellet.
+            case(CellType::PowerPelletT):{
+                score+=50;
+                currRow-=1;
+                board.updateCell(currRow,currCol,CellType::PacmanT);
+                board.updateCell(currRow+1,currCol,CellType::EmptyT);
                 updatePosition(currRow,currCol);
                 break;
             }
             
-            case(cellType::GhostT):{
+            case(CellType::GhostT):{
                 // TODO : Kill Pac and exit the game. Make this more sophisticated.
-                killPacman();
+                Signal s = killPacman();
+                if(s==Signal::GameOver){
+                    assert(lives==0 and "lives non zero and kill signal");
+                    isAlive = false;
+                    return;
+                }
+                isAlive = true;
                 break;
             }
-            // consume pellet
-            case(cellType::PelletT):{
-                score+=1;
-                currRow-=1;
-                board.updateCell(currRow,currCol,cellType::PacmanT);
-                board.updateCell(currRow+1,currCol,cellType::EmptyT);
-                updatePosition(currRow,currCol);
-                break;
-            }
-            // Consume power pellet.
-            case(cellType::PowerPelletT):{
-                score+=50;
-                currRow-=1;
-                board.updateCell(currRow,currCol,cellType::PacmanT);
-                board.updateCell(currRow+1,currCol,cellType::EmptyT);
-                updatePosition(currRow,currCol);
-                break;
-            }
-            //  Nothing happens
-            case(cellType::WallT):{
-                break;
-            }
+
             assert("Unexpected request for up movement of pac...\n");
         }
     }
@@ -223,45 +235,54 @@ private:
         // Cannot move down from the last row. TODO : can interpass from last to first row, if valid.
         if(currRow==board.getRows()-1)
             return;
-        char entity = board.getEntityAt(currRow+1,currCol);
+        CellType entity = board.getEntityAt(currRow+1,currCol);
         switch(entity){
             // Just move up.
-            case(cellType::EmptyT):{
+            case(CellType::EmptyT):{
                 currRow+=1;
-                board.updateCell(currRow,currCol,cellType::PacmanT);
-                board.updateCell(currRow-1,currCol,cellType::EmptyT);
+                board.updateCell(currRow,currCol,CellType::PacmanT);
+                board.updateCell(currRow-1,currCol,CellType::EmptyT);
                 updatePosition(currRow,currCol);
                 break;
             }
-            
-            case(cellType::GhostT):{
-                // TODO : Kill Pac and exit the game. Make this more sophisticated.
-                killPacman();
+
+            //  Nothing happens
+            case(CellType::WallT):{
                 break;
             }
+
             // consume pellet
-            case(cellType::PelletT):{
+            case(CellType::PelletT):{
                 score+=1;
                 currRow+=1;
-                board.updateCell(currRow,currCol,cellType::PacmanT);
-                board.updateCell(currRow-1,currCol,cellType::EmptyT);
+                board.updateCell(currRow,currCol,CellType::PacmanT);
+                board.updateCell(currRow-1,currCol,CellType::EmptyT);
                 updatePosition(currRow,currCol);
                 break;
             }
             // Consume power pellet.
-            case(cellType::PowerPelletT):{
+            case(CellType::PowerPelletT):{
                 score+=50;
                 currRow+=1;
-                board.updateCell(currRow,currCol,cellType::PacmanT);
-                board.updateCell(currRow-1,currCol,cellType::EmptyT);
+                board.updateCell(currRow,currCol,CellType::PacmanT);
+                board.updateCell(currRow-1,currCol,CellType::EmptyT);
                 updatePosition(currRow,currCol);
                 break;
             }
-            //  Nothing happens
-            case(cellType::WallT):{
+            
+            case(CellType::GhostT):{
+                // TODO : Kill Pac and exit the game. Make this more sophisticated.
+                Signal s = killPacman();
+                if(s==Signal::GameOver){
+                    assert(lives==0 and "lives non zero and kill signal");
+                    isAlive = false;
+                    return;
+                }
+                isAlive = true;
                 break;
             }
-            assert("Unexpected request for up movement of pac...\n");
+
+            assert("Unexpected request for down movement of pac...\n");
         }
     }
 
@@ -273,44 +294,54 @@ private:
         // already at first col cannot move furthur leftwards
         if(currCol==0)
             return;
-        char entity = board.getEntityAt(currCol-1,currRow);
+        CellType entity = board.getEntityAt(currRow,currCol-1);
         switch(entity){
-            case(cellType::EmptyT):{
+            case(CellType::EmptyT):{
                 currCol-=1;
-                board.updateCell(currRow,currCol,cellType::PacmanT);
-                board.updateCell(currRow,currCol+1,cellType::EmptyT);
+                board.updateCell(currRow,currCol,CellType::PacmanT);
+                board.updateCell(currRow,currCol+1,CellType::EmptyT);
+                updatePosition(currRow,currCol);
+                break;
+            }
+
+            //  Nothing happens
+            case(CellType::WallT):{
+                break;
+            }
+
+            // consume pellet
+            case(CellType::PelletT):{
+                score+=1;
+                currCol-=1;
+                board.updateCell(currRow,currCol,CellType::PacmanT);
+                board.updateCell(currRow,currCol+1,CellType::EmptyT);
+                updatePosition(currRow,currCol);
+                break;
+            }
+
+            // Consume power pellet.
+            case(CellType::PowerPelletT):{
+                score+=50;
+                currCol-=1;
+                board.updateCell(currRow,currCol,CellType::PacmanT);
+                board.updateCell(currRow,currCol+1,CellType::EmptyT);
                 updatePosition(currRow,currCol);
                 break;
             }
             
-            case(cellType::GhostT):{
+            case(CellType::GhostT):{
                 // TODO : Kill Pac and exit the game. Make this more sophisticated.
-                killPacman();
+                Signal s = killPacman();
+               if(s==Signal::GameOver){
+                    assert(lives==0 and "lives non zero and kill signal");
+                    isAlive = false;
+                    return;
+                }
+                isAlive = true;
                 break;
             }
-            // consume pellet
-            case(cellType::PelletT):{
-                score+=1;
-                currCol-=1;
-                board.updateCell(currRow,currCol,cellType::PacmanT);
-                board.updateCell(currRow,currCol+1,cellType::EmptyT);
-                updatePosition(currRow,currCol);
-                break;
-            }
-            // Consume power pellet.
-            case(cellType::PowerPelletT):{
-                score+=50;
-                currCol-=1;
-                board.updateCell(currRow,currCol,cellType::PacmanT);
-                board.updateCell(currRow,currCol+1,cellType::EmptyT);
-                updatePosition(currRow,currCol);
-                break;
-            }
-            //  Nothing happens
-            case(cellType::WallT):{
-                break;
-            }
-            assert("Unexpected request for up movement of pac...\n");
+            
+            assert("Unexpected request for left movement of pac...\n");
         }
     }
 
@@ -320,46 +351,56 @@ private:
         int currRow = currPos.first;
         int currCol = currPos.second;
         // already at last col cannot move furthur rightwards
-        if(currCol==board.getCols())
+        if(currCol==board.getCols()-1)
             return;
-        char entity = board.getEntityAt(currCol+1,currRow);
+        CellType entity = board.getEntityAt(currRow,currCol+1);
         switch(entity){
-            case(cellType::EmptyT):{
+            case(CellType::EmptyT):{
                 currCol+=1;
-                board.updateCell(currRow,currCol,cellType::PacmanT);
-                board.updateCell(currRow,currCol-1,cellType::EmptyT);
+                board.updateCell(currRow,currCol,CellType::PacmanT);
+                board.updateCell(currRow,currCol-1,CellType::EmptyT);
+                updatePosition(currRow,currCol);
+                break;
+            }
+
+             //  Nothing happens
+            case(CellType::WallT):{
+                break;
+            }
+
+            // consume pellet
+            case(CellType::PelletT):{
+                score+=1;
+                currCol+=1;
+                board.updateCell(currRow,currCol,CellType::PacmanT);
+                board.updateCell(currRow,currCol-1,CellType::EmptyT);
+                updatePosition(currRow,currCol);
+                break;
+            }
+
+            // Consume power pellet.
+            case(CellType::PowerPelletT):{
+                score+=50;
+                currCol+=1;
+                board.updateCell(currRow,currCol,CellType::PacmanT);
+                board.updateCell(currRow,currCol-1,CellType::EmptyT);
                 updatePosition(currRow,currCol);
                 break;
             }
             
-            case(cellType::GhostT):{
+            case(CellType::GhostT):{
                 // TODO : Kill Pac and exit the game. Make this more sophisticated.
-                killPacman();
+                Signal s = killPacman();
+                if(s==Signal::GameOver){
+                    assert(lives==0 and "lives non zero and kill signal");
+                    isAlive = false;
+                    return;
+                }
+                isAlive = true;
                 break;
             }
-            // consume pellet
-            case(cellType::PelletT):{
-                score+=1;
-                currCol+=1;
-                board.updateCell(currRow,currCol,cellType::PacmanT);
-                board.updateCell(currRow,currCol-1,cellType::EmptyT);
-                updatePosition(currRow,currCol);
-                break;
-            }
-            // Consume power pellet.
-            case(cellType::PowerPelletT):{
-                score+=50;
-                currCol+=1;
-                board.updateCell(currRow,currCol,cellType::PacmanT);
-                board.updateCell(currRow,currCol-1,cellType::EmptyT);
-                updatePosition(currRow,currCol);
-                break;
-            }
-            //  Nothing happens
-            case(cellType::WallT):{
-                break;
-            }
-            assert("Unexpected request for up movement of pac...\n");
+
+            assert("Unexpected request for right movement of pac...\n");
         }
     }
 
@@ -378,23 +419,31 @@ public:
         return score;
     }
 
+    bool pacLifeStatus(){
+        return (isAlive && lives>=1);
+    }
+
+    unsigned lifeLeftCount() {
+        return lives;
+    }
     // Pass GameState as the GameContext and let this Object flow through code as a base context.
-    void move(Direction direction, GameState state){
+    void move(Direction direction, GameState *state){
+        assert(state->pac->pacLifeStatus() && "Pac no longer live...\n");
         switch(direction){
             case(Direction::Up):{
-                handleUpMovement(state.board);
+                handleUpMovement(*state->board);
                 break;
             }
             case(Direction::Down):{
-                handleDownMovement(state.board);
+                handleDownMovement(*state->board);
                 break;
             }
             case(Direction::Left):{
-                handleLeftMovement(state.board);
+                handleLeftMovement(*state->board);
                 break;
             }
             case(Direction::Right):{
-                handleRightMovement(state.board);
+                handleRightMovement(*state->board);
                 break;
             }
         }
@@ -406,7 +455,7 @@ public:
         assert((rowu>=0 and rowu<board.getRows()) and (colu>=0 and colu<board.getCols()) and "Invalid Initialization of Pacman, check location...\n");
         row = rowu;
         col = colu;
-        board.updateCell(row,col,cellType::PacmanT);
+        board.updateCell(row,col,CellType::PacmanT);
     }
 
     void resetScore(){
@@ -425,7 +474,7 @@ private:
         assert((rowu>=0 and rowu<board.getRows()) and (colu>=0 and colu<board.getCols()) and "Invalid Initialization of Ghost, check location...\n");
         row = position.first;
         col = position.second;
-        board.updateCell(row,col,cellType::GhostT);
+        board.updateCell(row,col,CellType::GhostT);
     }
 
 public:
@@ -464,6 +513,15 @@ public:
         return pty;
     }
 };
+
+void GameState::renderGameState() {
+    auto pos = pac->getPostion();
+    cout<<"LIVES LEFT : "<<pac->lifeLeftCount()<<" | X = "<<pos.first<<" Y = "<<pos.second<<" |  Score : "<<pac->getScore()<<"\n";
+    this->board->renderBoard();
+    cout<<"\n\n\n";
+}
+
+void GameState::updateGameState(){}
 
 /// @brief A Game only has a game state and ability to update it, Initalize it. 
 class Game{
@@ -552,34 +610,35 @@ public:
     }
 
     void initalizeGameSimplestPolicy(){
-        GameBoard &board = state->board;
+        GameBoard &board = *state->board;
         for(int i =0;i<6;i++){
-            board.updateCell(0,i,cellType::WallT);
-            board.updateCell(5,i,cellType::WallT);
-            board.updateCell(i,0,cellType::WallT);
-            board.updateCell(i,5,cellType::WallT);
+            board.updateCell(0,i,CellType::WallT);
+            board.updateCell(5,i,CellType::WallT);
+            board.updateCell(i,0,CellType::WallT);
+            board.updateCell(i,5,CellType::WallT);
         }
-        board.updateCell(2,2,cellType::WallT);
-        board.updateCell(2,3,cellType::WallT);
-        board.updateCell(3,2,cellType::WallT);
-        board.updateCell(3,3,cellType::WallT);
-        board.updateCell(1,1,cellType::PelletT);
-        board.updateCell(1,4,cellType::PelletT);
-        board.updateCell(4,1,cellType::PelletT);
-        board.updateCell(4,4,cellType::PelletT);
+        board.updateCell(2,2,CellType::WallT);
+        board.updateCell(2,3,CellType::WallT);
+        board.updateCell(3,2,CellType::WallT);
+        board.updateCell(3,3,CellType::WallT);
+        board.updateCell(1,1,CellType::PelletT);
+        board.updateCell(1,4,CellType::PelletT);
+        board.updateCell(4,1,CellType::PelletT);
+        board.updateCell(4,4,CellType::PelletT);
         Pacman *pac = state->pac;
         pac->resetPac(board,pac->getPostion());
-        board.updateCell(2,1,cellType::GhostT);
-        board.updateCell(3,4,cellType::GhostT);
+        board.updateCell(2,1,CellType::GhostT);
+        board.updateCell(3,4,CellType::GhostT);
         for(int i =0;i<6;i++){
             for(int j =0;j<6;j++)
-                if(board.getEntityAt(i,j)==cellType::EmptyT)
-                    board.updateCell(i,j,cellType::PelletT);
+                if(board.getEntityAt(i,j)==CellType::EmptyT)
+                    board.updateCell(i,j,CellType::PelletT);
         }
         board.renderBoard();
     }
 
     void getAndProcessInputClassic(){
+        assert(state->pac->pacLifeStatus() and "Cannot process command for non live Pac...");
         char input;
         cin>>input;
         #ifdef DEBUG 
@@ -587,34 +646,22 @@ public:
         #endif
         switch(input){
             case 'w': {
-                #ifdef DEBUG 
-                    cout<<">>> Moving Up: "<<'\n';
-                #endif
-                state->pac->move(Direction::Up,*state);
+                state->pac->move(Direction::Up,state);
                 break;
             }
 
             case 's': {
-                #ifdef DEBUG 
-                    cout<<">>> Moving Down: "<<'\n';
-                #endif
-                state->pac->move(Direction::Down,*state);
+                state->pac->move(Direction::Down,state);
                 break;
             }
 
             case 'd': {
-                #ifdef DEBUG 
-                    cout<<">>> Moving Left: "<<'\n';
-                #endif
-                state->pac->move(Direction::Right,*state);
+                state->pac->move(Direction::Right,state);
                 break;
             }
 
             case 'a': {
-                #ifdef DEBUG 
-                    cout<<">>> Moving Right: "<<'\n';
-                #endif
-                state->pac->move(Direction::Left,*state);
+                state->pac->move(Direction::Left,state);
                 break;
             }
 
@@ -656,11 +703,11 @@ public:
     }
 
     void render(){
-        // #ifdef _WIN32
-        //     system("cls");
-        // #elif __linux__
-        //     system("clear");
-        // #endif
+        #ifdef _WIN32
+            system("cls");
+        #elif __linux__
+            system("clear");
+        #endif
         // TODO : Add rendering of score, lives left.
         state->renderGameState();
     }
@@ -669,13 +716,13 @@ public:
         // setNonBlocking();
         initalizeGameSimplestPolicy();
         int devBreak = 0;
-        while(true){
+        while(true and state->pac->pacLifeStatus()){
             getAndProcessInputClassic();
             state->updateGameState();
             render();
             devBreak++;
             // dev break cycle till the exit logic comes
-            if(devBreak==4)
+            if(devBreak==10)
                 break;
            this_thread::sleep_for(chrono::microseconds(100));
         }
@@ -686,7 +733,9 @@ public:
 
 int main(){
     Pacman *pac = new Pacman(1,2);
-    GameState *state = new GameState(GameBoard(6,6), pac,{Ghost(2,1),Ghost(3,4)});
+    vector<Ghost> ghosts = {Ghost(2,1),Ghost(3,4)};
+    GameBoard *board = new GameBoard(6,6);
+    GameState *state = new GameState(board, pac,&ghosts);
     Game g(state);
     g.runGame();
 }
