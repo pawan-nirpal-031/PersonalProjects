@@ -86,6 +86,8 @@ public:
 
     void renderBoard() const {
         for(int i =0;i<rows;i++){
+            for(int i =0;i<7;i++)
+                cout<<" ";
             for(int j =0;j<cols;j++){
                 cout<<getCellCharByCellType(board[i][j])<<' ';
             }
@@ -487,8 +489,206 @@ public:
         return make_pair(row,col);
     }
 
-    void updatePosition(){
+    // For now we decide on moving a ghost Randomly. Takes game state and exploration depth for recursive attemps.
+    void updatePositionRandomPolicy(GameState *state,int &depth){
+        if(depth==0)
+            return;
+        GameBoard &board = *state->board;
+        unsigned int getDir = rand()%4;
+        Direction dir = static_cast<Direction>(getDir);
+        switch(dir){
+            case(Direction::Up):{
+                if(row>0){
+                    CellType entity = board.getEntityAt(row-1,col);
+                    switch(entity){
+                        case(CellType::EmptyT):{
+                            row -=1;
+                            board.updateCell(row,col,CellType::GhostT);
+                            board.updateCell(row+1,col,CellType::EmptyT);
+                            break;
+                        }
+                        
+                        case(CellType::GhostT):{
+                            depth-=1;
+                            updatePositionRandomPolicy(state,depth);
+                            break;
+                        }
 
+                        case(CellType::PacmanT):{
+                            // TODO : Get the guy.
+                        }
+
+                        case(CellType::PelletT):{
+                            // Check game syementics, for now move the pallet to previous position of ghost.
+                            row-=1;
+                            board.updateCell(row,col,CellType::GhostT);
+                            board.updateCell(row+1,col,CellType::PelletT);
+                            break;
+                        }
+
+                        case(CellType::PowerPelletT):{
+                            row-=1;
+                            board.updateCell(row,col,CellType::GhostT);
+                            board.updateCell(row+1,col,CellType::PowerPelletT);
+                            break;
+                        }
+
+                        case(CellType::WallT):{
+                            depth-=1;
+                            updatePositionRandomPolicy(state,depth);
+                            break;
+                        }   
+                    }
+                }else{
+                    depth-=1;
+                    updatePositionRandomPolicy(state,depth);
+                }
+            }
+
+            case(Direction::Down):{
+                if(row<board.getRows()-1){
+                    CellType entity = board.getEntityAt(row+1,col);
+                    switch(entity){
+                        case(CellType::EmptyT):{
+                            row +=1;
+                            board.updateCell(row,col,CellType::GhostT);
+                            board.updateCell(row-1,col,CellType::EmptyT);
+                            break;
+                        }
+                        
+                        case(CellType::GhostT):{
+                            depth-=1;
+                            updatePositionRandomPolicy(state,depth);
+                            break;
+                        }
+
+                        case(CellType::PacmanT):{
+                            // TODO : Get the guy.
+                        }
+
+                        case(CellType::PelletT):{
+                            // Check game syementics, for now move the pallet to previous position of ghost.
+                            row+=1;
+                            board.updateCell(row,col,CellType::GhostT);
+                            board.updateCell(row-1,col,CellType::PelletT);
+                            break;
+                        }
+
+                        case(CellType::PowerPelletT):{
+                            row+=1;
+                            board.updateCell(row,col,CellType::GhostT);
+                            board.updateCell(row-1,col,CellType::PowerPelletT);
+                            break;
+                        }
+
+                        case(CellType::WallT):{
+                            depth-=1;
+                            updatePositionRandomPolicy(state,depth);
+                            break;
+                        }   
+                    }
+                }else{
+                    depth-=1;
+                    updatePositionRandomPolicy(state,depth);
+                }
+            }
+
+            case(Direction::Right):{
+                if(col<board.getCols()-1){
+                    CellType entity = board.getEntityAt(row,col+1);
+                    switch(entity){
+                        case(CellType::EmptyT):{
+                            col +=1;
+                            board.updateCell(row,col,CellType::GhostT);
+                            board.updateCell(row,col-1,CellType::EmptyT);
+                            break;
+                        }
+                        
+                        case(CellType::GhostT):{
+                            depth-=1;
+                            updatePositionRandomPolicy(state,depth);
+                            break;
+                        }
+
+                        case(CellType::PacmanT):{
+                            // TODO : Get the guy.
+                        }
+
+                        case(CellType::PelletT):{
+                            // Check game syementics, for now move the pallet to previous position of ghost.
+                            col+=1;
+                            board.updateCell(row,col,CellType::GhostT);
+                            board.updateCell(row,col-1,CellType::PelletT);
+                            break;
+                        }
+
+                        case(CellType::PowerPelletT):{
+                            col+=1;
+                            board.updateCell(row,col,CellType::GhostT);
+                            board.updateCell(row,col-1,CellType::PowerPelletT);
+                            break;
+                        }
+
+                        case(CellType::WallT):{
+                            depth-=1;
+                            updatePositionRandomPolicy(state,depth);
+                            break;
+                        }   
+                    }
+                }else{
+                    depth-=1;
+                    updatePositionRandomPolicy(state,depth);
+                }
+            }
+
+            case(Direction::Left):{
+                if(col>0){
+                    CellType entity = board.getEntityAt(row,col-1);
+                    switch(entity){
+                        case(CellType::EmptyT):{
+                            col -=1;
+                            board.updateCell(row,col,CellType::GhostT);
+                            board.updateCell(row,col+1,CellType::EmptyT);
+                            break;
+                        }
+                        
+                        case(CellType::GhostT):{
+                            depth-=1;
+                            updatePositionRandomPolicy(state,depth);
+                            break;
+                        }
+
+                        case(CellType::PacmanT):{
+                            // TODO : Get the guy.
+                        }
+
+                        case(CellType::PelletT):{
+                            // Check game syementics, for now move the pallet to previous position of ghost.
+                            col -=1;
+                            board.updateCell(row,col,CellType::GhostT);
+                            board.updateCell(row,col+1,CellType::PelletT);
+                            break;
+                        }
+
+                        case(CellType::PowerPelletT):{
+                            col+=1;
+                            board.updateCell(row,col,CellType::GhostT);
+                            board.updateCell(row,col+1,CellType::PowerPelletT);
+                            break;
+                        }
+
+                        case(CellType::WallT):{
+                            depth-=1;
+                            updatePositionRandomPolicy(state,depth);
+                            break;
+                        }   
+                    }
+                }else{
+                    depth-=1;
+                    updatePositionRandomPolicy(state,depth);
+                }
+            }
+        }
     }
 };
 
@@ -719,6 +919,11 @@ public:
         while(true and state->pac->pacLifeStatus()){
             getAndProcessInputClassic();
             state->updateGameState();
+            // for(int i =0;i<state->ghosts->size();i++){
+            //     // Number of tries per ghost
+            //     int randomPolicyUpd = 3;
+            //     state->ghosts->at(i).updatePositionRandomPolicy(state,randomPolicyUpd);
+            // }
             render();
             devBreak++;
             // dev break cycle till the exit logic comes
