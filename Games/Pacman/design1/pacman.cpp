@@ -78,6 +78,7 @@ private:
     }
 
 public:
+    // Left, Dowm, Right, Up
     vector<pair<int,int>> Visit4Neighbours = {{0,-1},{1,0},{0,1},{-1,0}};
     GameBoard(int rows,int cols){
         hasBeenInitalized = true;
@@ -530,8 +531,144 @@ public:
             cout<<"Ghost at : "<<row<<" , "<<col<<" is unreachable from Pac...\n";
         else{
             unsigned long MinDistFromPac = Distance[row][col];
+            for(int i =0;i<board.getRows();i++){
+                for(int j =0;j<board.getCols();j++){
+                    if(Distance[i][j]==INT64_MAX)
+                        cout<<"#";
+                    else
+                        cout<<Distance[i][j];
+                    cout<<" ";
+                }
+                cout<<"\n";
+            }
             if(MinDistFromPac<INT64_MAX){
-                
+                // TODO : move towards pac to hunt him.
+                char dirToMove = ' ';
+                for(int i =0;i<4;i++){
+                    auto neighbour = board.Visit4Neighbours[i];
+                    int nxtrow = row + neighbour.first;
+                    int nxtcol = col + neighbour.second;
+                    if(not board.isValidCell(nxtrow,nxtcol))
+                        continue;
+                    if(board.getEntityAt(nxtrow,nxtcol)==CellType::WallT or board.getEntityAt(nxtrow,nxtcol)==CellType::GhostT)
+                        continue;
+                    cout<<Distance[nxtrow][nxtcol]<<" "<<MinDistFromPac<<"\n";
+                    if(MinDistFromPac = Distance[nxtrow][nxtcol] + 1){
+                        if(i==0)
+                            dirToMove = 'l';
+                        else if(i==1)
+                            dirToMove = 'd';
+                        else if(i==2)
+                            dirToMove = 'r';
+                        else
+                            dirToMove = 'u';
+                    }
+                }
+                if(dirToMove!=' '){
+                    switch(dirToMove){
+                        case('u'):{
+                            CellType entity = board.getEntityAt(row-1,col);
+                            switch(entity){
+                                case(CellType::EmptyT):{
+                                    row-=1;
+                                    board.updateCell(row,col,CellType::GhostT);
+                                    board.updateCell(row+1,col,CellType::EmptyT);
+                                    break;
+                                }case(CellType::GhostT):{
+                                    break;
+                                }case(CellType::PacmanT):{
+                                    // TODO : get him
+                                    break;
+                                }case(CellType::PelletT):{
+                                    row-=1;
+                                    board.updateCell(row,col,CellType::GhostT);
+                                    board.updateCell(row+1,col,CellType::PelletT);
+                                    break;
+                                }case(CellType::PowerPelletT):{
+                                    row-=1;
+                                    board.updateCell(row,col,CellType::GhostT);
+                                    board.updateCell(row+1,col,CellType::PowerPelletT);
+                                    break;
+                                }
+                            }
+                        }case('d'):{
+                            CellType entity = board.getEntityAt(row+1,col);
+                            switch(entity){
+                                case(CellType::EmptyT):{
+                                    row+=1;
+                                    board.updateCell(row,col,CellType::GhostT);
+                                    board.updateCell(row-1,col,CellType::EmptyT);
+                                    break;
+                                }case(CellType::GhostT):{
+                                    break;
+                                }case(CellType::PacmanT):{
+                                    // TODO : get him
+                                    break;
+                                }case(CellType::PelletT):{
+                                    row+=1;
+                                    board.updateCell(row,col,CellType::GhostT);
+                                    board.updateCell(row-1,col,CellType::PelletT);
+                                    break;
+                                }case(CellType::PowerPelletT):{
+                                    row+=1;
+                                    board.updateCell(row,col,CellType::GhostT);
+                                    board.updateCell(row-1,col,CellType::PowerPelletT);
+                                    break;
+                                }
+                            }
+                        }case('r'):{
+                            CellType entity = board.getEntityAt(row,col+1);
+                            switch(entity){
+                                case(CellType::EmptyT):{
+                                    col+=1;
+                                    board.updateCell(row,col,CellType::GhostT);
+                                    board.updateCell(row,col-1,CellType::EmptyT);
+                                    break;
+                                }case(CellType::GhostT):{
+                                    break;
+                                }case(CellType::PacmanT):{
+                                    // TODO : get him
+                                    break;
+                                }case(CellType::PelletT):{
+                                    col+=1;
+                                    board.updateCell(row,col,CellType::GhostT);
+                                    board.updateCell(row,col-1,CellType::PelletT);
+                                    break;
+                                }case(CellType::PowerPelletT):{
+                                    col+=1;
+                                    board.updateCell(row,col,CellType::GhostT);
+                                    board.updateCell(row,col-1,CellType::PowerPelletT);
+                                    break;
+                                }
+                            }
+                        }case('l'):{
+                            CellType entity = board.getEntityAt(row,col-1);
+                            switch(entity){
+                                case(CellType::EmptyT):{
+                                    col-=1;
+                                    board.updateCell(row,col,CellType::GhostT);
+                                    board.updateCell(row,col+1,CellType::EmptyT);
+                                    break;
+                                }case(CellType::GhostT):{
+                                    break;
+                                }case(CellType::PacmanT):{
+                                    // TODO : get him
+                                    break;
+                                }case(CellType::PelletT):{
+                                    col-=1;
+                                    board.updateCell(row,col,CellType::GhostT);
+                                    board.updateCell(row,col+1,CellType::PelletT);
+                                    break;
+                                }case(CellType::PowerPelletT):{
+                                    col-=1;
+                                    board.updateCell(row,col,CellType::GhostT);
+                                    board.updateCell(row,col+1,CellType::PowerPelletT);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
             }else{
                 cout<<"Ghost out of reach IG...\n";
             }
@@ -975,7 +1112,7 @@ public:
             render();
             devBreak++;
             // dev break cycle till the exit logic comes
-            if(devBreak==10)
+            if(devBreak==100)
                 break;
            this_thread::sleep_for(chrono::microseconds(100));
         }
