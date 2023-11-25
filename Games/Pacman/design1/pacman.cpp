@@ -142,24 +142,6 @@ private:
     this->col = ucol;
   }
 
-  // A kill request raised when paccy has ran into a ghost or a ghost hunted
-  // down the Pac.
-  Signal killPacman() {
-    assert(lives >= 1 && "Cannot be killed without a life...\n");
-    if (lives == 1) {
-      lives = 0;
-      isAlive = false;
-      cout << "GAME OVER :(\n";
-      return Signal::GameOver;
-    } else {
-      // Giving it another life.
-      lives -= 1;
-      isAlive = false;
-      cout << "YOU JUST GOT KILLED STARTING OVER, LIFE : " << lives << "\n";
-      return Signal::StartNextLife;
-    }
-  }
-
   void handleUpMovement(GameBoard &board) {
     assert(pacLifeStatus() && "Pac not live...\n");
     pair<unsigned, unsigned> currPos = getPostion();
@@ -410,6 +392,28 @@ public:
 
   bool pacLifeStatus() { return (isAlive && lives >= 1); }
 
+  void updateAliveStatus(bool status){
+    this->isAlive = status;
+  }
+
+  // A kill request raised when paccy has ran into a ghost or a ghost hunted
+  // down the Pac.
+  Signal killPacman() {
+    assert(lives >= 1 && "Cannot be killed without a life...\n");
+    if (lives == 1) {
+      lives = 0;
+      isAlive = false;
+      cout << "GAME OVER :(\n";
+      return Signal::GameOver;
+    } else {
+      // Giving it another life.
+      lives -= 1;
+      isAlive = false;
+      cout << "YOU JUST GOT KILLED STARTING OVER, LIFE : " << lives << "\n";
+      return Signal::StartNextLife;
+    }
+  }
+
   unsigned lifeLeftCount() { return lives; }
   // Pass GameState as the GameContext and let this Object flow through code as
   // a base context.
@@ -465,7 +469,15 @@ private:
     board.updateCell(row, col, CellType::GhostT);
   }
 
-  void KillPacman(GameState *state) {}
+  void KillPacman(GameState *state) {
+    Signal signal =  state->pac->killPacman();
+    if (signal == Signal::GameOver) {
+        assert(state->pac->lifeLeftCount() == 0 and "lives non zero and kill signal");
+        state->pac->updateAliveStatus(false);
+        return;
+    }
+    state->pac->updateAliveStatus(true);
+  }
 
 public:
   Ghost(int srow, int scol) {
@@ -927,6 +939,7 @@ void GameState::renderGameState() {
   cout << "\n\n\n";
 }
 
+// Is this relevent any more? is this useful?? 
 void GameState::updateGameState() {}
 
 /// @brief A Game only has a game state and ability to update it, Initalize it.
