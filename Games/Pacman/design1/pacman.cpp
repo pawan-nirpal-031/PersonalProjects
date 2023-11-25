@@ -487,6 +487,10 @@ private:
         board.updateCell(row,col,CellType::GhostT);
     }
 
+    void KillPacman(GameState *state){
+
+    }
+
 public:
     Ghost(int srow,int scol){
         row = srow;
@@ -577,6 +581,7 @@ public:
                                     break;
                                 }case(CellType::PacmanT):{
                                     // TODO : get him
+                                    KillPacman(state);
                                     break;
                                 }case(CellType::PelletT):{
                                     row-=1;
@@ -603,6 +608,7 @@ public:
                                     break;
                                 }case(CellType::PacmanT):{
                                     // TODO : get him
+                                    KillPacman(state);
                                     break;
                                 }case(CellType::PelletT):{
                                     row+=1;
@@ -629,6 +635,7 @@ public:
                                     break;
                                 }case(CellType::PacmanT):{
                                     // TODO : get him
+                                    KillPacman(state);
                                     break;
                                 }case(CellType::PelletT):{
                                     col+=1;
@@ -655,6 +662,7 @@ public:
                                     break;
                                 }case(CellType::PacmanT):{
                                     // TODO : get him
+                                    KillPacman(state);
                                     break;
                                 }case(CellType::PelletT):{
                                     col-=1;
@@ -705,7 +713,8 @@ public:
 
                         case(CellType::PacmanT):{
                             // TODO : Get the guy.
-                        }
+                            KillPacman(state);
+                        }break;
 
                         case(CellType::PelletT):{
                             // Check game syementics, for now move the pallet to previous position of ghost.
@@ -732,7 +741,7 @@ public:
                     depth-=1;
                     updatePositionRandomPolicy(state,depth);
                 }
-            }
+            }break;
 
             case(Direction::Down):{
                 if(row<board.getRows()-1){
@@ -753,7 +762,8 @@ public:
 
                         case(CellType::PacmanT):{
                             // TODO : Get the guy.
-                        }
+                            KillPacman(state);
+                        }break;
 
                         case(CellType::PelletT):{
                             // Check game syementics, for now move the pallet to previous position of ghost.
@@ -780,7 +790,7 @@ public:
                     depth-=1;
                     updatePositionRandomPolicy(state,depth);
                 }
-            }
+            }break;
 
             case(Direction::Right):{
                 if(col<board.getCols()-1){
@@ -801,6 +811,8 @@ public:
 
                         case(CellType::PacmanT):{
                             // TODO : Get the guy.
+                            KillPacman(state);
+                            break;
                         }
 
                         case(CellType::PelletT):{
@@ -828,7 +840,7 @@ public:
                     depth-=1;
                     updatePositionRandomPolicy(state,depth);
                 }
-            }
+            }break;
 
             case(Direction::Left):{
                 if(col>0){
@@ -849,6 +861,8 @@ public:
 
                         case(CellType::PacmanT):{
                             // TODO : Get the guy.
+                            KillPacman(state);
+                            break;
                         }
 
                         case(CellType::PelletT):{
@@ -876,7 +890,7 @@ public:
                     depth-=1;
                     updatePositionRandomPolicy(state,depth);
                 }
-            }
+            }break;
         }
     }
 };
@@ -1113,7 +1127,8 @@ public:
             state->updateGameState();
             for(int i =0;i<state->ghosts->size();i++){
                 // Number of tries per ghost
-                state->ghosts->at(i).updatePositionClosestDistancePolicy(state);
+                int depth = 3;
+                state->ghosts->at(i).updatePositionRandomPolicy(state,depth);
             }
             render();
             devBreak++;
@@ -1128,7 +1143,7 @@ public:
 
 int main(){
     Pacman *pac = new Pacman(1,2);
-    vector<Ghost> ghosts = {Ghost(2,1)};
+    vector<Ghost> ghosts = {Ghost(2,1),Ghost(3,4)};
     GameBoard *board = new GameBoard(6,6);
     GameState *state = new GameState(board, pac,&ghosts);
     Game g(state);
