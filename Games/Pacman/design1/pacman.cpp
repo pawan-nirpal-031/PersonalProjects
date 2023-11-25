@@ -552,8 +552,7 @@ public:
                         continue;
                     if(board.getEntityAt(nxtrow,nxtcol)==CellType::WallT or board.getEntityAt(nxtrow,nxtcol)==CellType::GhostT)
                         continue;
-                    cout<<Distance[nxtrow][nxtcol]<<" "<<MinDistFromPac<<"\n";
-                    if(MinDistFromPac = Distance[nxtrow][nxtcol] + 1){
+                    if(MinDistFromPac == Distance[nxtrow][nxtcol] + 1){
                         if(i==0)
                             dirToMove = 'l';
                         else if(i==1)
@@ -591,6 +590,7 @@ public:
                                     break;
                                 }
                             }
+                            break;
                         }case('d'):{
                             CellType entity = board.getEntityAt(row+1,col);
                             switch(entity){
@@ -616,6 +616,7 @@ public:
                                     break;
                                 }
                             }
+                            break;
                         }case('r'):{
                             CellType entity = board.getEntityAt(row,col+1);
                             switch(entity){
@@ -641,6 +642,7 @@ public:
                                     break;
                                 }
                             }
+                            break;
                         }case('l'):{
                             CellType entity = board.getEntityAt(row,col-1);
                             switch(entity){
@@ -667,6 +669,7 @@ public:
                                 }
                             }
                         }
+                        break;
                     }
                 }
             }else{
@@ -1013,8 +1016,11 @@ public:
         board.updateCell(4,4,CellType::PelletT);
         Pacman *pac = state->pac;
         pac->resetPac(board,pac->getPostion());
-        board.updateCell(2,1,CellType::GhostT);
-        board.updateCell(3,4,CellType::GhostT);
+        for(int g =0;g<state->ghosts->size();g++){
+            auto pos = state->ghosts->at(g).getPostion();
+            board.updateCell(pos.first,pos.second,CellType::GhostT);
+        }
+
         for(int i =0;i<6;i++){
             for(int j =0;j<6;j++)
                 if(board.getEntityAt(i,j)==CellType::EmptyT)
@@ -1122,7 +1128,7 @@ public:
 
 int main(){
     Pacman *pac = new Pacman(1,2);
-    vector<Ghost> ghosts = {Ghost(2,1),Ghost(3,4)};
+    vector<Ghost> ghosts = {Ghost(2,1)};
     GameBoard *board = new GameBoard(6,6);
     GameState *state = new GameState(board, pac,&ghosts);
     Game g(state);
