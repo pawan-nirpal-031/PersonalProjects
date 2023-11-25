@@ -1,1 +1,1 @@
-make board cell of type CellType and not char. 
+Do better initalization policy. 

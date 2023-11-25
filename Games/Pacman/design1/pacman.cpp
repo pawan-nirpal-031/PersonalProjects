@@ -392,9 +392,7 @@ public:
 
   bool pacLifeStatus() { return (isAlive && lives >= 1); }
 
-  void updateAliveStatus(bool status){
-    this->isAlive = status;
-  }
+  void updateAliveStatus(bool status) { this->isAlive = status; }
 
   // A kill request raised when paccy has ran into a ghost or a ghost hunted
   // down the Pac.
@@ -470,11 +468,15 @@ private:
   }
 
   void KillPacman(GameState *state) {
-    Signal signal =  state->pac->killPacman();
+    // IF Dead already then return.
+    if (state->pac->pacLifeStatus() == false)
+      return;
+    Signal signal = state->pac->killPacman();
     if (signal == Signal::GameOver) {
-        assert(state->pac->lifeLeftCount() == 0 and "lives non zero and kill signal");
-        state->pac->updateAliveStatus(false);
-        return;
+      assert(state->pac->lifeLeftCount() == 0 and
+             "lives non zero and kill signal");
+      state->pac->updateAliveStatus(false);
+      return;
     }
     state->pac->updateAliveStatus(true);
   }
@@ -490,6 +492,10 @@ public:
   // Perform a bfs starting at the PAC and annotate the graph, with the Minimum
   // distance to reach that point, if that point in maze was reachable. And this
   // would be unique for each invocation of updation of this ghost position.
+  // TODO : This does not seem to be different for every ghost on board, So
+  // redoing this computation for each ghost might not be fesible. Unless
+  // Multithreading is used, even then board will always be the same for each
+  // ghost.
   void updatePositionClosestDistancePolicy(GameState *state) {
     GameBoard &board = *state->board;
     vector<vector<unsigned long>> Distance(
@@ -529,16 +535,6 @@ public:
            << " is unreachable from Pac...\n";
     else {
       unsigned long MinDistFromPac = Distance[row][col];
-      for (int i = 0; i < board.getRows(); i++) {
-        for (int j = 0; j < board.getCols(); j++) {
-          if (Distance[i][j] == INT64_MAX)
-            cout << "#";
-          else
-            cout << Distance[i][j];
-          cout << " ";
-        }
-        cout << "\n";
-      }
       if (MinDistFromPac < INT64_MAX) {
         // TODO : move towards pac to hunt him.
         char dirToMove = ' ';
@@ -939,7 +935,7 @@ void GameState::renderGameState() {
   cout << "\n\n\n";
 }
 
-// Is this relevent any more? is this useful?? 
+// Is this relevent any more? is this useful??
 void GameState::updateGameState() {}
 
 /// @brief A Game only has a game state and ability to update it, Initalize it.
@@ -1121,11 +1117,11 @@ public:
   void updateGameState() {}
 
   void render() {
-    // #ifdef _WIN32
-    //     system("cls");
-    // #elif __linux__
-    //     system("clear");
-    // #endif
+#ifdef _WIN32
+    system("cls");
+#elif __linux__
+    system("clear");
+#endif
     // TODO : Add rendering of score, lives left.
     state->renderGameState();
   }
@@ -1133,20 +1129,15 @@ public:
   void runGame() {
     // setNonBlocking();
     initalizeGameSimplestPolicy();
-    int devBreak = 0;
-    while (true and state->pac->pacLifeStatus()) {
+    while (state->pac->pacLifeStatus()) {
       getAndProcessInputClassic();
       state->updateGameState();
       for (int i = 0; i < state->ghosts->size(); i++) {
         // Number of tries per ghost
         int depth = 3;
-        state->ghosts->at(i).updatePositionRandomPolicy(state, depth);
+        state->ghosts->at(i).updatePositionClosestDistancePolicy(state);
       }
       render();
-      devBreak++;
-      // dev break cycle till the exit logic comes
-      if (devBreak == 100)
-        break;
       this_thread::sleep_for(chrono::microseconds(100));
     }
     // restoreBlocking();
