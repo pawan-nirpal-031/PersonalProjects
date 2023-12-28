@@ -5,12 +5,35 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/opencv.hpp>
+#include <vector>
 using namespace std;
 using namespace cv;
 
 void displayImage(Mat &img, unsigned int time = 0) {
   imshow("frame", img);
   waitKey(time);
+}
+
+vector<vector<double>> getGuassianKernal(int size, double sigma) {
+  vector<vector<double>> Kernal(size, vector<double>(size, 0.0));
+  double sum = 0.0;
+  int center = size / 2;
+  for (int i = 0; i < size; i++) {
+    for (int j = 0; j < size; j++) {
+      int x = i - center;
+      int y = j - center;
+      Kernal[i][j] = exp(-(x * x + y * y) / (2 * sigma * sigma));
+      sum += Kernal[i][j];
+    }
+  }
+  if (sum != 0) {
+    for (int i = 0; i < size; i++) {
+      for (int j = 0; j < size; j++) {
+        Kernal[i][j] /= sum;
+      }
+    }
+  }
+  return Kernal;
 }
 
 void Transform1(Mat &image) {
@@ -144,23 +167,23 @@ void histogramEqualization(Mat &img) {
   displayImage(transformed);
 }
 
-void guassianAverageFilterTransform(Mat &img) {
+void guassianAverageFilterTransform(Mat &img, int FiltSize = 3,
+                                    double Sigma = 1.0) {
   displayImage(img);
-  int filtSize = 3;
-  vector<vector<int>> filter = {{1, 2, 1}, {2, 4, 2}, {1, 2, 1}};
-  int trows = img.rows - filtSize + 1;
-  int tcols = img.cols - filtSize + 1;
+  vector<vector<double>> filter = getGuassianKernal(FiltSize, Sigma);
+  int trows = img.rows - FiltSize + 1;
+  int tcols = img.cols - FiltSize + 1;
   Mat transformed(trows, tcols, IMREAD_GRAYSCALE);
   for (int i = 1; i <= trows - 2; i++) {
     for (int j = 1; j <= tcols - 2; j++) {
-      int tval = 0;
+      double tval = 0;
       for (int x = -1; x <= 1; x++) {
         for (int y = -1; y <= 1; y++) {
           tval = tval + (filter[x + 1][y + 1] *
                          static_cast<int>(img.at<u_char>(i + x, j + y)));
         }
       }
-      transformed.at<u_char>(i, j) = static_cast<u_char>(tval / 16);
+      transformed.at<u_char>(i, j) = static_cast<u_char>(tval);
     }
   }
   displayImage(transformed);
@@ -210,7 +233,7 @@ void horizontalEdgeFilterTransform(Mat &img) {
   displayImage(transformed);
 }
 
-void medianFilter(Mat &img) {
+Mat medianFilter(Mat &img) {
   displayImage(img);
   int filtSize = 3;
   int trows = img.rows - filtSize + 1;
@@ -229,7 +252,20 @@ void medianFilter(Mat &img) {
     }
   }
   displayImage(transformed);
+  return transformed;
 }
+
+// Fourier transform vairent fast fourier transform can perform convolution
+// opreation of nxn image in n(logn) time this is the fastest method for
+// convolution opreation. It is done using divide and conquer recursive
+// algorithm. Implement convolution using fft. Similarlly corelation as well.
+// vector<int> getValueRepresenation(vector<int> CoeffRep){
+//   int n = CoeffRep.size();
+//   if(n==1)
+//     return CoeffRep;
+//   double w = exp()
+// }
+
 // Impulse signal double flips on filter application. Convolution nullifies this
 // double flip.  T(i,j)= $u$v (H(u,v)*I(i-u,j-u))  where $ is summation opreator
 // T is the transformed image, H is the filter, and I is the input image. So
@@ -249,15 +285,27 @@ void medianFilter(Mat &img) {
 // expensive, seperablity allows us in some cases to bring this computation down
 // to (2k * n^2) by performing 1d horizontal convolution followd by 1d vertial
 // convolution having the same effect as the k^2 computations per pixel at end.
-void convolution(Mat &img) {}
+void convolutionOptimized(Mat &img) {}
+
+// Implement canny edge detector
+/*
+  1) filter image with derivate of guassian
+  2) find magnitude and derection of the gradient
+  3) apply non max supression
+  4) linking and thresholding : use high and low threshold use high threshold to
+  say edge and low threshold to continue them, if a pixel is connected to an
+  edge pixel than it an edge pixek too.
+*/
+
+Mat getCannyEdgesImg(Mat &img) {}
 
 int main() {
   string imPath =
-      "/home/panirpal/workspace/Projects/ComputerVision/data/saltpepper.png";
+      "/home/panirpal/workspace/Projects/ComputerVision/data/frm.png";
   Mat img = imread(imPath, IMREAD_GRAYSCALE);
-  if (!img.empty())
-    medianFilter(img);
-  else
+  if (!img.empty()) {
+    guassianAverageFilterTransform(img);
+  } else
     cerr << "image not found! exiting...";
   return 0;
 }
