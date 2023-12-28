@@ -1018,8 +1018,42 @@ private:
     return input;
   }
 
+  pair<unsigned,unsigned> getRandomDirection(unsigned urow,unsigned ucol){
+    unsigned dir = rand()%4;
+    auto add = state->board->Visit4Neighbours.at(dir);
+    return make_pair(add.first+urow,add.second+ucol);
+  }
+  
+  void generateMazeRecursivePolicy(GameBoard &board,vector<vector<bool>> &visited,unsigned urow,unsigned ucol){
+    if(visited[urow][ucol])
+      return;
+    visited[urow][ucol] = true;
+    board.updateCell(urow,ucol,CellType::PelletT);
+    auto randDir = getRandomDirection(urow,ucol);
+    while(true){
+      randDir = getRandomDirection(urow,ucol);
+      if(board.isValidCell(randDir.first,randDir.second))
+        break;
+    }
+    if(board.isValidCell(randDir.first,randDir.second) and (not visited[randDir.first][randDir.second])){
+      generateMazeRecursivePolicy(board,visited,randDir.first,randDir.second);
+    }
+  }
+
 public:
   Game(GameState *sstate) { state = sstate; }
+
+  void initalizeGameMazeGenerationPolicy(){
+    GameBoard &board = *state->board;
+    vector<vector<bool>> visited(board.getRows(),vector<bool>(board.getCols(),false));
+    for(int i = 0;i<board.getRows();i++){
+      for(int j =0;j<board.getCols();j++){
+        board.updateCell(i,j,CellType::WallT);
+      }
+    }
+    generateMazeRecursivePolicy(board,visited,0,0);
+    board.renderBoard();
+  }
 
   void initalizeGameSimplestPolicy() {
     GameBoard &board = *state->board;
@@ -1128,6 +1162,7 @@ public:
 
   void runGame() {
     // setNonBlocking();
+    //initalizeGameMazeGenerationPolicy();
     initalizeGameSimplestPolicy();
     while (state->pac->pacLifeStatus()) {
       getAndProcessInputClassic();
@@ -1145,9 +1180,12 @@ public:
 };
 
 int main() {
-  Pacman *pac = new Pacman(1, 2);
+  // Size of the board.
+  int bsize;
+  cin>>bsize;
+  GameBoard *board = new GameBoard(bsize,bsize);
+  Pacman *pac = new Pacman(1,2);
   vector<Ghost> ghosts = {Ghost(2, 1), Ghost(3, 4)};
-  GameBoard *board = new GameBoard(6, 6);
   GameState *state = new GameState(board, pac, &ghosts);
   Game g(state);
   g.runGame();

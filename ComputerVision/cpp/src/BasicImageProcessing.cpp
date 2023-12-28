@@ -167,26 +167,24 @@ void histogramEqualization(Mat &img) {
   displayImage(transformed);
 }
 
-void guassianAverageFilterTransform(Mat &img, int FiltSize = 3,
-                                    double Sigma = 1.0) {
-  displayImage(img);
+Mat guassianFilterTransform(Mat &img, int FiltSize = 3, double Sigma = 1.5) {
   vector<vector<double>> filter = getGuassianKernal(FiltSize, Sigma);
   int trows = img.rows - FiltSize + 1;
   int tcols = img.cols - FiltSize + 1;
-  Mat transformed(trows, tcols, IMREAD_GRAYSCALE);
+  Mat transformed(trows, tcols, CV_8U);
   for (int i = 1; i <= trows - 2; i++) {
     for (int j = 1; j <= tcols - 2; j++) {
       double tval = 0;
       for (int x = -1; x <= 1; x++) {
         for (int y = -1; y <= 1; y++) {
           tval = tval + (filter[x + 1][y + 1] *
-                         static_cast<int>(img.at<u_char>(i + x, j + y)));
+                         static_cast<double>(img.at<u_char>(i + x, j + y)));
         }
       }
       transformed.at<u_char>(i, j) = static_cast<u_char>(tval);
     }
   }
-  displayImage(transformed);
+  return (transformed);
 }
 
 void verticalEdgeFilterTransform(Mat &img) {
@@ -205,7 +203,7 @@ void verticalEdgeFilterTransform(Mat &img) {
                          static_cast<int>(img.at<u_char>(i + x, j + y)));
         }
       }
-      transformed.at<u_char>(i, j) = static_cast<u_char>(tval);
+      transformed.at<u_char>(i, j) = static_cast<u_char>(tval + 255);
     }
   }
   displayImage(transformed);
@@ -227,7 +225,7 @@ void horizontalEdgeFilterTransform(Mat &img) {
                          static_cast<int>(img.at<u_char>(i + x, j + y)));
         }
       }
-      transformed.at<u_char>(i, j) = static_cast<u_char>(tval);
+      transformed.at<u_char>(i, j) = static_cast<u_char>(tval + 255);
     }
   }
   displayImage(transformed);
@@ -296,15 +294,49 @@ void convolutionOptimized(Mat &img) {}
   say edge and low threshold to continue them, if a pixel is connected to an
   edge pixel than it an edge pixek too.
 */
+Mat sobelFilterEdgeTransform(Mat &img) {
+  int filtSize = 3;
+  vector<vector<int>> filtery, filterx;
+  filtery = {{-1, -2, -1}, {0, 0, 0}, {1, 2, 1}};
+  filterx = {{-1, 0, 1}, {-2, 0, 2}, {-1, 0, 1}};
+  int trows = img.rows - filtSize + 1;
+  int tcols = img.cols - filtSize + 1;
+  Mat transformed(trows, tcols, CV_8U);
+  for (int i = 1; i <= trows - 2; i++) {
+    for (int j = 1; j <= tcols - 2; j++) {
+      double tvalx = 0;
+      double tvaly = 0;
+      for (int x = -1; x <= 1; x++) {
+        for (int y = -1; y <= 1; y++) {
+          tvalx = tvalx + (filterx[x + 1][y + 1] *
+                           static_cast<double>(img.at<u_char>(i + x, j + y)));
+          tvaly = tvaly + (filtery[x + 1][y + 1] *
+                           static_cast<double>(img.at<u_char>(i + x, j + y)));
+        }
+      }
+      double tval = sqrt(tvalx * tvalx + tvaly * tvaly);
+      transformed.at<u_char>(i, j) = static_cast<u_char>(tval);
+    }
+  }
+  return (transformed);
+}
 
-Mat getCannyEdgesImg(Mat &img) {}
+Mat getCannyEdgesImg(Mat &img) {
+  Mat guassian = guassianFilterTransform(img);
+  Mat gx = sobelFilterEdgeTransform(guassian);
+  // Mat gy = sobelFilterTransformNormalized(guassian, 0);
+  // displayImage(gx);
+  // displayImage(gy);
+  return gx;
+}
 
 int main() {
   string imPath =
       "/home/panirpal/workspace/Projects/ComputerVision/data/frm.png";
   Mat img = imread(imPath, IMREAD_GRAYSCALE);
   if (!img.empty()) {
-    guassianAverageFilterTransform(img);
+    Mat out = getCannyEdgesImg(img);
+    displayImage(out);
   } else
     cerr << "image not found! exiting...";
   return 0;
