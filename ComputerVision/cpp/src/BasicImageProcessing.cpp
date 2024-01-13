@@ -294,14 +294,16 @@ void convolutionOptimized(Mat &img) {}
   say edge and low threshold to continue them, if a pixel is connected to an
   edge pixel than it an edge pixek too.
 */
-Mat sobelFilterEdgeTransform(Mat &img) {
+// Returns Magnitude of Gradient and direction of Gradient.
+Mat sobelFilterEdgeTransformWithNonMaxSupression(Mat &img) {
   int filtSize = 3;
   vector<vector<int>> filtery, filterx;
   filtery = {{-1, -2, -1}, {0, 0, 0}, {1, 2, 1}};
   filterx = {{-1, 0, 1}, {-2, 0, 2}, {-1, 0, 1}};
   int trows = img.rows - filtSize + 1;
   int tcols = img.cols - filtSize + 1;
-  Mat transformed(trows, tcols, CV_8U);
+  Mat gradMag(trows, tcols, CV_8U);
+  Mat gradDir(trows, tcols, CV_64F);
   for (int i = 1; i <= trows - 2; i++) {
     for (int j = 1; j <= tcols - 2; j++) {
       double tvalx = 0;
@@ -315,19 +317,51 @@ Mat sobelFilterEdgeTransform(Mat &img) {
         }
       }
       double tval = sqrt(tvalx * tvalx + tvaly * tvaly);
-      transformed.at<u_char>(i, j) = static_cast<u_char>(tval);
+      if (tvalx == 0.00) {
+        gradDir.at<double>(i, j) = (tvaly >= 0 ? M_PI / 2.0 : -M_PI / 2.0);
+      } else {
+        gradDir.at<double>(i, j) = atan(tvaly / tvalx);
+      }
+      gradDir.at<double>(i, j) *= (180.0 / M_PI);
+      gradDir.at<double>(i, j) = abs(gradDir.at<double>(i, j));
+      gradMag.at<u_char>(i, j) = static_cast<u_char>(tval);
     }
   }
-  return (transformed);
+  Mat finalImg(trows, tcols, CV_8U);
+  for (int i = 1; i < trows - 1; i++) {
+    for (int j = 1; j < tcols - 1; j++) {
+      double angle = gradDir.at<double>(i, j);
+      double neigh1, neigh2;
+      if ((angle >= 0 and angle < 22.5) or (angle >= 157.5 && angle < 180)) {
+        neigh1 = gradMag.at<u_char>(i, j + 1);
+        neigh2 = gradMag.at<u_char>(i, j - 1);
+      } else if ((angle >= 22.5 and angle < 67.5)) {
+        neigh1 = gradMag.at<u_char>(i - 1, j + 1);
+        neigh2 = gradMag.at<u_char>(i + 1, j - 1);
+      } else if ((angle >= 67.5 and angle < 112.5)) {
+        neigh1 = gradMag.at<u_char>(i - 1, j);
+        neigh2 = gradMag.at<u_char>(i + 1, j);
+      } else if ((angle >= 112.5 and angle < 157.5)) {
+        neigh1 = gradMag.at<u_char>(i - 1, j - 1);
+        neigh2 = gradMag.at<u_char>(i + 1, j + 1);
+      } else {
+        neigh1 = neigh2 = 0;
+      }
+
+      if (gradMag.at<u_char>(i, j) >= max(neigh1, neigh2))
+        finalImg.at<u_char>(i, j) = gradMag.at<u_char>(i, j);
+      else
+        finalImg.at<u_char>(i, j) = 0;
+    }
+  }
+  return finalImg;
 }
 
 Mat getCannyEdgesImg(Mat &img) {
   Mat guassian = guassianFilterTransform(img);
-  Mat gx = sobelFilterEdgeTransform(guassian);
-  // Mat gy = sobelFilterTransformNormalized(guassian, 0);
-  // displayImage(gx);
-  // displayImage(gy);
-  return gx;
+  Mat sobelAndNMSImg = sobelFilterEdgeTransformWithNonMaxSupression(guassian);
+
+  return sobelAndNMSImg;
 }
 
 int main() {
