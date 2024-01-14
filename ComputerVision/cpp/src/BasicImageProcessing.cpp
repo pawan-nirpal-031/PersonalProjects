@@ -473,6 +473,9 @@ Mat getCannyEdgesImg(Mat &img) {
 }
 
 int main() {
+
+
+  
   string imPath =
       "/home/panirpal/workspace/Projects/ComputerVision/data/frm.png";
   Mat img = imread(imPath, IMREAD_GRAYSCALE);
