@@ -9,8 +9,8 @@
 using namespace std;
 using namespace cv;
 
-void displayImage(Mat &img, unsigned int time = 0) {
-  imshow("frame", img);
+void displayImage(Mat &img, unsigned int time = 0, string title = "frame") {
+  imshow(title, img);
   waitKey(time);
 }
 
@@ -391,19 +391,56 @@ pair<int, int> getDoubleThresholds(Mat &img) {
   return {upperI, lowerI};
 }
 
+bool isStrongEdgePoint(int x, int y, Mat &img) {
+  return (static_cast<int>(img.at<u_char>(x, y)) == 255);
+}
+
+bool isWeakEdgePoint(int x, int y, Mat &img) {
+  return (static_cast<int>(img.at<u_char>(x, y)) == 128);
+}
+
 void edgeTracking(int u, int v, Mat &img) {
   int rows = img.rows;
   int cols = img.cols;
   if (static_cast<int>(img.at<u_char>(u, v)) == 128) {
+    bool isConnectedToStrongEdge = false;
     for (int x = -1; x <= 1; x++) {
       for (int y = -1; y <= 1; y++) {
         if (isValidPoint(img, u + x, v + y) and
-            static_cast<int>(img.at<u_char>(u + x, v + y)) == 255) {
-          img.at<u_char>(u, v) = 255;
+            isStrongEdgePoint(u + x, v + y, img)) {
+          isConnectedToStrongEdge = true;
+        }
+      }
+    }
+    if (isConnectedToStrongEdge) {
+      img.at<u_char>(u, v) = 255;
+      for (int x = -1; x <= 1; x++) {
+        for (int y = -1; y <= 1; y++) {
+          if (isValidPoint(img, u + x, v + y) and
+              isWeakEdgePoint(u + x, v + y, img)) {
+            edgeTracking(u + x, v + y, img);
+          }
         }
       }
     }
   }
+}
+
+void performDiff(Mat img1, Mat img2) {
+  int rows = img1.rows;
+  int cols = img2.cols;
+  Mat diff(rows, cols, CV_8U);
+  bool zero = true;
+  for (int i = 0; i < rows; i++) {
+    for (int j = 0; j < cols; j++) {
+      int d = (static_cast<int>(img1.at<u_char>(i, j)) -
+               static_cast<int>(img2.at<u_char>(i, j)));
+      diff.at<u_char>(i, j) = d;
+      if (d != 0)
+        zero = false;
+    }
+  }
+  displayImage(diff, 0, "diff image");
 }
 
 Mat getCannyEdgesImg(Mat &img) {
