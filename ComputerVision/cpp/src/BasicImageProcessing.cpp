@@ -14,6 +14,12 @@ void displayImage(Mat &img, unsigned int time = 0) {
   waitKey(time);
 }
 
+bool isValidPoint(Mat &img, int x, int y) {
+  int rows = img.rows;
+  int cols = img.cols;
+  return (x >= 0 and x < rows and y >= 0 and y < cols);
+}
+
 vector<vector<double>> getGuassianKernal(int size, double sigma) {
   vector<vector<double>> Kernal(size, vector<double>(size, 0.0));
   double sum = 0.0;
@@ -357,11 +363,76 @@ Mat sobelFilterEdgeTransformWithNonMaxSupression(Mat &img) {
   return finalImg;
 }
 
+pair<int, int> getDoubleThresholds(Mat &img) {
+  int rows = img.rows;
+  int cols = img.cols;
+  vector<int> frequency(256, 0);
+  for (int i = 0; i < rows; i++) {
+    for (int j = 0; j < cols; j++) {
+      frequency[static_cast<int>(img.at<u_char>(i, j))] += 1;
+    }
+  }
+  int upperI = 0;
+  int upperF = 0;
+  for (int i = 192; i <= 210; i++) {
+    if (frequency[i] > upperF) {
+      upperF = frequency[i];
+      upperI = i;
+    }
+  }
+  int lowerI = 0;
+  int lowerF = INT_MAX;
+  for (int i = 40; i <= 60; i++) {
+    if (frequency[i] < lowerF) {
+      lowerF = frequency[i];
+      lowerI = i;
+    }
+  }
+  return {upperI, lowerI};
+}
+
+void edgeTracking(int u, int v, Mat &img) {
+  int rows = img.rows;
+  int cols = img.cols;
+  if (static_cast<int>(img.at<u_char>(u, v)) == 128) {
+    for (int x = -1; x <= 1; x++) {
+      for (int y = -1; y <= 1; y++) {
+        if (isValidPoint(img, u + x, v + y) and
+            static_cast<int>(img.at<u_char>(u + x, v + y)) == 255) {
+          img.at<u_char>(u, v) = 255;
+        }
+      }
+    }
+  }
+}
+
 Mat getCannyEdgesImg(Mat &img) {
   Mat guassian = guassianFilterTransform(img);
   Mat sobelAndNMSImg = sobelFilterEdgeTransformWithNonMaxSupression(guassian);
-
-  return sobelAndNMSImg;
+  int rows = sobelAndNMSImg.rows;
+  int cols = sobelAndNMSImg.cols;
+  pair<int, int> thresholds = getDoubleThresholds(sobelAndNMSImg);
+  int upperI = thresholds.first;
+  int lowerI = thresholds.second;
+  vector<pair<int, int>> weakEds;
+  Mat result(rows, cols, CV_8U);
+  for (int i = 0; i < rows; i++) {
+    for (int j = 0; j < cols; j++) {
+      double mag = static_cast<double>(sobelAndNMSImg.at<u_char>(i, j));
+      if (mag >= upperI) {
+        result.at<u_char>(i, j) = 255;
+      } else if (mag >= lowerI) {
+        result.at<u_char>(i, j) = 128;
+        weakEds.push_back({i, j});
+      } else {
+        result.at<u_char>(i, j) = 0;
+      }
+    }
+  }
+  for (auto point : weakEds) {
+    edgeTracking(point.first, point.second, result);
+  }
+  return result;
 }
 
 int main() {
