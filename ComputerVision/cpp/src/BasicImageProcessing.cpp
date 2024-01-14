@@ -374,7 +374,7 @@ pair<int, int> getDoubleThresholds(Mat &img) {
   }
   int upperI = 0;
   int upperF = 0;
-  for (int i = 192; i <= 210; i++) {
+  for (int i = 210; i <= 240; i++) {
     if (frequency[i] > upperF) {
       upperF = frequency[i];
       upperI = i;
@@ -416,6 +416,8 @@ void edgeTracking(int u, int v, Mat &img) {
       img.at<u_char>(u, v) = 255;
       for (int x = -1; x <= 1; x++) {
         for (int y = -1; y <= 1; y++) {
+          if(x==0 and y==0)
+            continue;
           if (isValidPoint(img, u + x, v + y) and
               isWeakEdgePoint(u + x, v + y, img)) {
             edgeTracking(u + x, v + y, img);
@@ -473,9 +475,6 @@ Mat getCannyEdgesImg(Mat &img) {
 }
 
 int main() {
-
-
-  
   string imPath =
       "/home/panirpal/workspace/Projects/ComputerVision/data/frm.png";
   Mat img = imread(imPath, IMREAD_GRAYSCALE);
