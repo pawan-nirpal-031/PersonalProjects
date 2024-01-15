@@ -416,7 +416,7 @@ void edgeTracking(int u, int v, Mat &img) {
       img.at<u_char>(u, v) = 255;
       for (int x = -1; x <= 1; x++) {
         for (int y = -1; y <= 1; y++) {
-          if(x==0 and y==0)
+          if (x == 0 and y == 0)
             continue;
           if (isValidPoint(img, u + x, v + y) and
               isWeakEdgePoint(u + x, v + y, img)) {
@@ -474,9 +474,29 @@ Mat getCannyEdgesImg(Mat &img) {
   return result;
 }
 
+int getValIntOf(Mat &img, int x, int y) {
+  return static_cast<int>(img.at<u_char>(x, y));
+}
+
+Mat laplacianOfGuassian(Mat &img) {
+  Mat gaussain = guassianFilterTransform(img);
+  int rows = img.rows;
+  int cols = img.cols;
+  Mat LaplacianOfGuassian(rows, cols, CV_8U);
+  for (int x = 1; x < rows - 1; x++) {
+    for (int y = 1; y < cols - 1; y++) {
+      double val = getValIntOf(img, x + 1, y) + getValIntOf(img, x - 1, y) +
+                   getValIntOf(img, x, y + 1) + getValIntOf(img, x, y - 1) -
+                   4 * getValIntOf(img, x, y);
+      LaplacianOfGuassian.at<u_char>(x, y) = val;
+    }
+  }
+  return LaplacianOfGuassian;
+}
+
 int main() {
   string imPath =
-      "/home/panirpal/workspace/Projects/ComputerVision/data/frm.png";
+      "/home/panirpal/workspace/Projects/ComputerVision/data/home.jpg";
   Mat img = imread(imPath, IMREAD_GRAYSCALE);
   if (!img.empty()) {
     Mat out = getCannyEdgesImg(img);

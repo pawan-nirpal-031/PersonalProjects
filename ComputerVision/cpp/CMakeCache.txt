@@ -27,8 +27,6 @@ CMAKE_BUILD_TYPE:STRING=
 //Enable/Disable color output during build.
 CMAKE_COLOR_MAKEFILE:BOOL=ON
 
-CMAKE_CONFIGURATION_TYPES:STRING=Debug
-
 //CXX compiler
 CMAKE_CXX_COMPILER:FILEPATH=/usr/bin/c++
 
@@ -147,7 +145,7 @@ CMAKE_PROJECT_DESCRIPTION:STATIC=
 CMAKE_PROJECT_HOMEPAGE_URL:STATIC=
 
 //Value Computed by CMake
-CMAKE_PROJECT_NAME:STATIC=machineVision
+CMAKE_PROJECT_NAME:STATIC=MachineVision
 
 //Path to a program.
 CMAKE_RANLIB:FILEPATH=/usr/bin/ranlib
@@ -211,17 +209,17 @@ CMAKE_STRIP:FILEPATH=/usr/bin/strip
 // Studio IDE projects all commands are done without /nologo.
 CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 
+//Value Computed by CMake
+MachineVision_BINARY_DIR:STATIC=/home/panirpal/workspace/Projects/ComputerVision/cpp
+
+//Value Computed by CMake
+MachineVision_IS_TOP_LEVEL:STATIC=ON
+
+//Value Computed by CMake
+MachineVision_SOURCE_DIR:STATIC=/home/panirpal/workspace/Projects/ComputerVision/cpp
+
 //The directory containing a CMake configuration file for OpenCV.
 OpenCV_DIR:PATH=/usr/local/lib/cmake/opencv4
-
-//Value Computed by CMake
-machineVision_BINARY_DIR:STATIC=/home/panirpal/workspace/Projects/ComputerVision/cpp
-
-//Value Computed by CMake
-machineVision_IS_TOP_LEVEL:STATIC=ON
-
-//Value Computed by CMake
-machineVision_SOURCE_DIR:STATIC=/home/panirpal/workspace/Projects/ComputerVision/cpp
 
 
 ########################

@@ -117,41 +117,41 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named machineVision
+# Target rules for targets named MachineVision
 
 # Build rule for target.
-machineVision: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 machineVision
-.PHONY : machineVision
+MachineVision: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 MachineVision
+.PHONY : MachineVision
 
 # fast build rule for target.
-machineVision/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/machineVision.dir/build.make CMakeFiles/machineVision.dir/build
-.PHONY : machineVision/fast
+MachineVision/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MachineVision.dir/build.make CMakeFiles/MachineVision.dir/build
+.PHONY : MachineVision/fast
 
-src/BasicImageProcessing.o: src/BasicImageProcessing.cpp.o
-.PHONY : src/BasicImageProcessing.o
+src/ArtifactDetectors/Edges/CannyEdgeDetector.o: src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.o
+.PHONY : src/ArtifactDetectors/Edges/CannyEdgeDetector.o
 
 # target to build an object file
-src/BasicImageProcessing.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/machineVision.dir/build.make CMakeFiles/machineVision.dir/src/BasicImageProcessing.cpp.o
-.PHONY : src/BasicImageProcessing.cpp.o
+src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MachineVision.dir/build.make CMakeFiles/MachineVision.dir/src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.o
+.PHONY : src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.o
 
-src/BasicImageProcessing.i: src/BasicImageProcessing.cpp.i
-.PHONY : src/BasicImageProcessing.i
+src/ArtifactDetectors/Edges/CannyEdgeDetector.i: src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.i
+.PHONY : src/ArtifactDetectors/Edges/CannyEdgeDetector.i
 
 # target to preprocess a source file
-src/BasicImageProcessing.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/machineVision.dir/build.make CMakeFiles/machineVision.dir/src/BasicImageProcessing.cpp.i
-.PHONY : src/BasicImageProcessing.cpp.i
+src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MachineVision.dir/build.make CMakeFiles/MachineVision.dir/src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.i
+.PHONY : src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.i
 
-src/BasicImageProcessing.s: src/BasicImageProcessing.cpp.s
-.PHONY : src/BasicImageProcessing.s
+src/ArtifactDetectors/Edges/CannyEdgeDetector.s: src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.s
+.PHONY : src/ArtifactDetectors/Edges/CannyEdgeDetector.s
 
 # target to generate assembly for a file
-src/BasicImageProcessing.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/machineVision.dir/build.make CMakeFiles/machineVision.dir/src/BasicImageProcessing.cpp.s
-.PHONY : src/BasicImageProcessing.cpp.s
+src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MachineVision.dir/build.make CMakeFiles/MachineVision.dir/src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.s
+.PHONY : src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.s
 
 # Help Target
 help:
@@ -161,10 +161,10 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... machineVision"
-	@echo "... src/BasicImageProcessing.o"
-	@echo "... src/BasicImageProcessing.i"
-	@echo "... src/BasicImageProcessing.s"
+	@echo "... MachineVision"
+	@echo "... src/ArtifactDetectors/Edges/CannyEdgeDetector.o"
+	@echo "... src/ArtifactDetectors/Edges/CannyEdgeDetector.i"
+	@echo "... src/ArtifactDetectors/Edges/CannyEdgeDetector.s"
 .PHONY : help
 
 

@@ -63,7 +63,7 @@ CMAKE_BINARY_DIR = /home/panirpal/workspace/Projects/ComputerVision/cpp
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
-all: CMakeFiles/machineVision.dir/all
+all: CMakeFiles/MachineVision.dir/all
 .PHONY : all
 
 # The main recursive "preinstall" target.
@@ -71,34 +71,34 @@ preinstall:
 .PHONY : preinstall
 
 # The main recursive "clean" target.
-clean: CMakeFiles/machineVision.dir/clean
+clean: CMakeFiles/MachineVision.dir/clean
 .PHONY : clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/machineVision.dir
+# Target rules for target CMakeFiles/MachineVision.dir
 
 # All Build rule for target.
-CMakeFiles/machineVision.dir/all:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/machineVision.dir/build.make CMakeFiles/machineVision.dir/depend
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/machineVision.dir/build.make CMakeFiles/machineVision.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/panirpal/workspace/Projects/ComputerVision/cpp/CMakeFiles --progress-num=1,2 "Built target machineVision"
-.PHONY : CMakeFiles/machineVision.dir/all
+CMakeFiles/MachineVision.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MachineVision.dir/build.make CMakeFiles/MachineVision.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MachineVision.dir/build.make CMakeFiles/MachineVision.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/panirpal/workspace/Projects/ComputerVision/cpp/CMakeFiles --progress-num=1,2 "Built target MachineVision"
+.PHONY : CMakeFiles/MachineVision.dir/all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/machineVision.dir/rule: cmake_check_build_system
+CMakeFiles/MachineVision.dir/rule: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/panirpal/workspace/Projects/ComputerVision/cpp/CMakeFiles 2
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/machineVision.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/MachineVision.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/panirpal/workspace/Projects/ComputerVision/cpp/CMakeFiles 0
-.PHONY : CMakeFiles/machineVision.dir/rule
+.PHONY : CMakeFiles/MachineVision.dir/rule
 
 # Convenience name for target.
-machineVision: CMakeFiles/machineVision.dir/rule
-.PHONY : machineVision
+MachineVision: CMakeFiles/MachineVision.dir/rule
+.PHONY : MachineVision
 
 # clean rule for target.
-CMakeFiles/machineVision.dir/clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/machineVision.dir/build.make CMakeFiles/machineVision.dir/clean
-.PHONY : CMakeFiles/machineVision.dir/clean
+CMakeFiles/MachineVision.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MachineVision.dir/build.make CMakeFiles/MachineVision.dir/clean
+.PHONY : CMakeFiles/MachineVision.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

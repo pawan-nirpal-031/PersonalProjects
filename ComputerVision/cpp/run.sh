@@ -1,6 +1,5 @@
-clang-format -i /home/panirpal/workspace/Projects/ComputerVision/cpp/src/BasicImageProcessing.cpp
-cmake . && make -j32 
-mv machineVision build
+cmake . && make -j32
+mv MachineVision build
 cd build 
-./machineVision
+./MachineVision
 cd - 
