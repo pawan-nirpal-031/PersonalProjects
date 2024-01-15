@@ -1,7 +1,9 @@
 CMakeFiles/MachineVision.dir/src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.o: \
  /home/panirpal/workspace/Projects/ComputerVision/cpp/src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp \
  /usr/include/stdc-predef.h \
- /home/panirpal/workspace/Projects/ComputerVision/cpp/src/ArtifactDetectors/Edges/../../Utils/Core/Core.h \
+ /home/panirpal/workspace/Projects/ComputerVision/cpp/src/ArtifactDetectors/Edges/../../BasicTransforms/GaussianTransform.h \
+ /home/panirpal/workspace/Projects/ComputerVision/cpp/src/ArtifactDetectors/Edges/../../BasicTransforms/../Utils/Kernals/GaussianKernal.h \
+ /home/panirpal/workspace/Projects/ComputerVision/cpp/src/ArtifactDetectors/Edges/../../BasicTransforms/../Utils/Kernals/../Core/Core.h \
  /usr/local/include/opencv4/opencv2/core.hpp \
  /usr/local/include/opencv4/opencv2/core/cvdef.h \
  /usr/local/include/opencv4/opencv2/core/version.hpp \
@@ -427,8 +429,6 @@ CMakeFiles/MachineVision.dir/src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.o
  /usr/local/include/opencv4/opencv2/video.hpp \
  /usr/local/include/opencv4/opencv2/video/tracking.hpp \
  /usr/local/include/opencv4/opencv2/video/background_segm.hpp \
- /home/panirpal/workspace/Projects/ComputerVision/cpp/src/ArtifactDetectors/Edges/../../Utils/Core/Utils.h \
  /home/panirpal/workspace/Projects/ComputerVision/cpp/src/ArtifactDetectors/Edges/../../Utils/Core/Core.h \
- /home/panirpal/workspace/Projects/ComputerVision/cpp/src/ArtifactDetectors/Edges/../../BasicTransforms/GaussianTransform.h \
- /home/panirpal/workspace/Projects/ComputerVision/cpp/src/ArtifactDetectors/Edges/../../BasicTransforms/../Utils/Kernals/GaussianKernal.h \
- /home/panirpal/workspace/Projects/ComputerVision/cpp/src/ArtifactDetectors/Edges/../../BasicTransforms/../Utils/Kernals/../Core/Core.h
+ /home/panirpal/workspace/Projects/ComputerVision/cpp/src/ArtifactDetectors/Edges/../../Utils/Core/Utils.h \
+ /home/panirpal/workspace/Projects/ComputerVision/cpp/src/ArtifactDetectors/Edges/../../Utils/Core/Core.h

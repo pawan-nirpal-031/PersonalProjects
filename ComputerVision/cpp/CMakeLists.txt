@@ -11,6 +11,7 @@ set(SOURCES
     src/Utils/Kernals/GaussianKernal.h
     src/BasicTransforms/GaussianTransform.h
     src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp
+    src/BasicTransforms/MiscTransforms.h
 )
 
 # Find OpenCV (assuming it's used in your project)

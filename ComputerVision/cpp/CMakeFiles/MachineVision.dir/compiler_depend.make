@@ -3,6 +3,8 @@
 
 CMakeFiles/MachineVision.dir/src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.o: src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp \
   /usr/include/stdc-predef.h \
+  src/BasicTransforms/GaussianTransform.h \
+  src/Utils/Kernals/GaussianKernal.h \
   src/Utils/Core/Core.h \
   /usr/local/include/opencv4/opencv2/core.hpp \
   /usr/local/include/opencv4/opencv2/core/cvdef.h \
@@ -487,10 +489,8 @@ CMakeFiles/MachineVision.dir/src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.o
   /usr/local/include/opencv4/opencv2/video.hpp \
   /usr/local/include/opencv4/opencv2/video/tracking.hpp \
   /usr/local/include/opencv4/opencv2/video/background_segm.hpp \
-  src/Utils/Core/Utils.h \
   src/Utils/Core/Core.h \
-  src/BasicTransforms/GaussianTransform.h \
-  src/Utils/Kernals/GaussianKernal.h \
+  src/Utils/Core/Utils.h \
   src/Utils/Core/Core.h
 
 
@@ -788,7 +788,13 @@ CMakeFiles/MachineVision.dir/src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.o
 
 /usr/include/x86_64-linux-gnu/bits/types/cookie_io_functions_t.h:
 
+/usr/include/x86_64-linux-gnu/bits/types/__fpos64_t.h:
+
 /usr/lib/gcc/x86_64-linux-gnu/11/include/avx512vldqintrin.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h:
+
+/usr/include/c++/11/bits/ostream_insert.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/avx512dqintrin.h:
 
@@ -863,10 +869,6 @@ CMakeFiles/MachineVision.dir/src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.o
 /usr/lib/gcc/x86_64-linux-gnu/11/include/movdirintrin.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/lzcntintrin.h:
-
-/usr/lib/gcc/x86_64-linux-gnu/11/include/enqcmdintrin.h:
-
-/usr/include/x86_64-linux-gnu/bits/waitflags.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/clzerointrin.h:
 
@@ -944,12 +946,6 @@ src/Utils/Core/Utils.h:
 
 src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp:
 
-/usr/lib/gcc/x86_64-linux-gnu/11/include/avx512ifmaintrin.h:
-
-/usr/local/include/opencv4/opencv2/flann/kdtree_single_index.h:
-
-/usr/include/c++/11/bits/char_traits.h:
-
 /usr/include/x86_64-linux-gnu/bits/endianness.h:
 
 /usr/include/c++/11/bits/stl_vector.h:
@@ -1000,12 +996,6 @@ src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/pconfigintrin.h:
 
-/usr/local/include/opencv4/opencv2/core/affine.hpp:
-
-/usr/lib/gcc/x86_64-linux-gnu/11/include/hresetintrin.h:
-
-/usr/lib/gcc/x86_64-linux-gnu/11/include/emmintrin.h:
-
 /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:
 
 /usr/include/c++/11/bits/stl_bvector.h:
@@ -1015,6 +1005,44 @@ src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp:
 /usr/include/x86_64-linux-gnu/bits/stdlib-bsearch.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/clockid_t.h:
+
+/usr/include/c++/11/bits/shared_ptr_base.h:
+
+/usr/include/c++/11/bits/basic_string.h:
+
+/usr/include/linux/limits.h:
+
+/usr/include/x86_64-linux-gnu/bits/posix2_lim.h:
+
+/usr/local/include/opencv4/opencv2/flann/composite_index.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/11/include/mwaitintrin.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/11/include/limits.h:
+
+/usr/include/x86_64-linux-gnu/bits/timesize.h:
+
+/usr/local/include/opencv4/opencv2/core/affine.hpp:
+
+/usr/lib/gcc/x86_64-linux-gnu/11/include/hresetintrin.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/11/include/emmintrin.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/11/include/enqcmdintrin.h:
+
+/usr/include/x86_64-linux-gnu/bits/waitflags.h:
+
+/usr/include/x86_64-linux-gnu/bits/wchar.h:
+
+/usr/include/x86_64-linux-gnu/bits/local_lim.h:
+
+/usr/include/c++/11/bits/stl_queue.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/struct_timespec.h:
+
+/usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
+
+/usr/include/x86_64-linux-gnu/sys/select.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/clock_t.h:
 
@@ -1042,57 +1070,17 @@ src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/rdseedintrin.h:
 
-src/BasicTransforms/GaussianTransform.h:
-
 /usr/include/c++/11/complex:
 
 /usr/include/x86_64-linux-gnu/c++/11/bits/cpu_defines.h:
 
-/usr/include/x86_64-linux-gnu/bits/timesize.h:
+src/BasicTransforms/GaussianTransform.h:
 
 /usr/include/c++/11/limits:
-
-/usr/include/x86_64-linux-gnu/bits/wchar.h:
-
-/usr/include/x86_64-linux-gnu/bits/local_lim.h:
-
-/usr/include/c++/11/bits/stl_queue.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/struct_timespec.h:
-
-/usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
-
-/usr/include/x86_64-linux-gnu/sys/select.h:
 
 /usr/local/include/opencv4/opencv2/flann/kmeans_index.h:
 
 /usr/include/features.h:
-
-/usr/include/c++/11/bits/shared_ptr_base.h:
-
-/usr/include/c++/11/bits/basic_string.h:
-
-/usr/include/linux/limits.h:
-
-/usr/include/x86_64-linux-gnu/bits/posix2_lim.h:
-
-/usr/local/include/opencv4/opencv2/flann/composite_index.h:
-
-/usr/lib/gcc/x86_64-linux-gnu/11/include/mwaitintrin.h:
-
-/usr/lib/gcc/x86_64-linux-gnu/11/include/limits.h:
-
-/usr/lib/gcc/x86_64-linux-gnu/11/include/lwpintrin.h:
-
-/usr/lib/gcc/x86_64-linux-gnu/11/include/avx512vlbwintrin.h:
-
-/usr/include/x86_64-linux-gnu/c++/11/bits/gthr-default.h:
-
-/usr/lib/gcc/x86_64-linux-gnu/11/include/avx512fintrin.h:
-
-/usr/lib/gcc/x86_64-linux-gnu/11/include/adxintrin.h:
-
-/usr/lib/gcc/x86_64-linux-gnu/11/include/avx512bf16vlintrin.h:
 
 /usr/include/c++/11/chrono:
 
@@ -1106,9 +1094,25 @@ src/BasicTransforms/GaussianTransform.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/locale_t.h:
 
-src/Utils/Kernals/GaussianKernal.h:
+/usr/lib/gcc/x86_64-linux-gnu/11/include/lwpintrin.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/11/include/avx512vlbwintrin.h:
+
+/usr/include/x86_64-linux-gnu/c++/11/bits/gthr-default.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/11/include/avx512fintrin.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/11/include/adxintrin.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/11/include/avx512bf16vlintrin.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
+
+/usr/include/x86_64-linux-gnu/bits/byteswap.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/mmintrin.h:
+
+src/Utils/Kernals/GaussianKernal.h:
 
 /usr/local/include/opencv4/opencv2/core/cv_cpu_dispatch.h:
 
@@ -1121,12 +1125,6 @@ src/Utils/Kernals/GaussianKernal.h:
 /usr/include/wctype.h:
 
 /usr/include/sched.h:
-
-/usr/include/alloca.h:
-
-/usr/lib/gcc/x86_64-linux-gnu/11/include/avx512ifmavlintrin.h:
-
-/usr/local/include/opencv4/opencv2/core/base.hpp:
 
 /usr/include/c++/11/cstdlib:
 
@@ -1172,9 +1170,17 @@ src/Utils/Kernals/GaussianKernal.h:
 
 /usr/include/c++/11/backward/binders.h:
 
-/usr/include/x86_64-linux-gnu/bits/byteswap.h:
+/usr/lib/gcc/x86_64-linux-gnu/11/include/avx512ifmaintrin.h:
 
-/usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
+/usr/local/include/opencv4/opencv2/flann/kdtree_single_index.h:
+
+/usr/include/c++/11/bits/char_traits.h:
+
+/usr/include/alloca.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/11/include/avx512ifmavlintrin.h:
+
+/usr/local/include/opencv4/opencv2/core/base.hpp:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/avx512vbmivlintrin.h:
 
@@ -1292,9 +1298,9 @@ src/Utils/Kernals/GaussianKernal.h:
 
 /usr/include/c++/11/new:
 
-/usr/lib/gcc/x86_64-linux-gnu/11/include/syslimits.h:
-
 /usr/include/features-time64.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/11/include/syslimits.h:
 
 /usr/include/c++/11/debug/debug.h:
 
@@ -1370,10 +1376,6 @@ src/Utils/Kernals/GaussianKernal.h:
 
 /usr/include/c++/11/string:
 
-/usr/include/c++/11/bits/ostream_insert.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h:
-
 /usr/include/c++/11/bits/stringfwd.h:
 
 /usr/include/c++/11/bits/locale_facets.tcc:
@@ -1447,8 +1449,6 @@ src/Utils/Core/Core.h:
 /usr/include/time.h:
 
 /usr/include/x86_64-linux-gnu/bits/setjmp.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/__fpos64_t.h:
 
 /usr/include/stdc-predef.h:
 

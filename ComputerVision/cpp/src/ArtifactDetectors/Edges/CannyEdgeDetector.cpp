@@ -1,9 +1,9 @@
 #ifndef CANNYEDGE
 #define CANNYEDGE
 
+#include "../../BasicTransforms/GaussianTransform.h"
 #include "../../Utils/Core/Core.h"
 #include "../../Utils/Core/Utils.h"
-#include "../../BasicTransforms/GaussianTransform.h"
 
 // Implement canny edge detector
 /*
@@ -169,7 +169,7 @@ Mat getCannyEdgesImg(Mat &img) {
   return result;
 }
 
-int main(){
+int main() {
   string imPath =
       "/home/panirpal/workspace/Projects/ComputerVision/data/home.jpg";
   Mat img = imread(imPath, IMREAD_GRAYSCALE);
