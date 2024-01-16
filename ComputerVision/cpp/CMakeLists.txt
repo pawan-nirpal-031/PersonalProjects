@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.12)
 
 project(MachineVision)
 
+if(YOUR_COMPILER_PATH)
+    set(CMAKE_CXX_COMPILER ${YOUR_COMPILER_PATH})
+endif()
+
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 11)
 
