@@ -7,6 +7,7 @@ CMakeFiles/MachineVision.dir/src/Driver/Driver.cpp.o
  /home/panirpal/workspace/Projects/ComputerVision/cpp/src/BasicTransforms/GaussianTransform.h
  /home/panirpal/workspace/Projects/ComputerVision/cpp/src/Utils/Kernals/GaussianKernal.h
  /home/panirpal/workspace/Projects/ComputerVision/cpp/src/Utils/Core/Core.h
+ /home/panirpal/workspace/Projects/ComputerVision/cpp/src/Utils/Core/Utils.h
  /usr/local/include/opencv4/opencv2/core.hpp
  /usr/local/include/opencv4/opencv2/core/cvdef.h
  /usr/local/include/opencv4/opencv2/core/version.hpp
