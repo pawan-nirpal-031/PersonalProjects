@@ -3,7 +3,8 @@
 
 #include "../Utils/Kernals/GaussianKernal.h"
 
-Mat guassianFilterTransform(Mat &img, int FiltSize = 3, double Sigma = 1.5) {
+static Mat guassianFilterTransform(Mat &img, int FiltSize = 3,
+                                   double Sigma = 1.5) {
   vector<vector<double>> filter = getGuassianKernal(FiltSize, Sigma);
   int trows = img.rows - FiltSize + 1;
   int tcols = img.cols - FiltSize + 1;
@@ -17,7 +18,7 @@ Mat guassianFilterTransform(Mat &img, int FiltSize = 3, double Sigma = 1.5) {
                          static_cast<double>(img.at<u_char>(i + x, j + y)));
         }
       }
-      transformed.at<u_char>(i, j) = static_cast<u_char>(tval);
+      transformed.at<u_char>(i, j) = static_cast<u_char>(min(255.0, tval));
     }
   }
   return (transformed);

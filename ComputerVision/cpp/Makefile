@@ -129,29 +129,29 @@ MachineVision/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/MachineVision.dir/build.make CMakeFiles/MachineVision.dir/build
 .PHONY : MachineVision/fast
 
-src/ArtifactDetectors/Edges/CannyEdgeDetector.o: src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.o
-.PHONY : src/ArtifactDetectors/Edges/CannyEdgeDetector.o
+src/Driver/Driver.o: src/Driver/Driver.cpp.o
+.PHONY : src/Driver/Driver.o
 
 # target to build an object file
-src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/MachineVision.dir/build.make CMakeFiles/MachineVision.dir/src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.o
-.PHONY : src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.o
+src/Driver/Driver.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MachineVision.dir/build.make CMakeFiles/MachineVision.dir/src/Driver/Driver.cpp.o
+.PHONY : src/Driver/Driver.cpp.o
 
-src/ArtifactDetectors/Edges/CannyEdgeDetector.i: src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.i
-.PHONY : src/ArtifactDetectors/Edges/CannyEdgeDetector.i
+src/Driver/Driver.i: src/Driver/Driver.cpp.i
+.PHONY : src/Driver/Driver.i
 
 # target to preprocess a source file
-src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/MachineVision.dir/build.make CMakeFiles/MachineVision.dir/src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.i
-.PHONY : src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.i
+src/Driver/Driver.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MachineVision.dir/build.make CMakeFiles/MachineVision.dir/src/Driver/Driver.cpp.i
+.PHONY : src/Driver/Driver.cpp.i
 
-src/ArtifactDetectors/Edges/CannyEdgeDetector.s: src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.s
-.PHONY : src/ArtifactDetectors/Edges/CannyEdgeDetector.s
+src/Driver/Driver.s: src/Driver/Driver.cpp.s
+.PHONY : src/Driver/Driver.s
 
 # target to generate assembly for a file
-src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/MachineVision.dir/build.make CMakeFiles/MachineVision.dir/src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.s
-.PHONY : src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.s
+src/Driver/Driver.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MachineVision.dir/build.make CMakeFiles/MachineVision.dir/src/Driver/Driver.cpp.s
+.PHONY : src/Driver/Driver.cpp.s
 
 # Help Target
 help:
@@ -162,9 +162,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... MachineVision"
-	@echo "... src/ArtifactDetectors/Edges/CannyEdgeDetector.o"
-	@echo "... src/ArtifactDetectors/Edges/CannyEdgeDetector.i"
-	@echo "... src/ArtifactDetectors/Edges/CannyEdgeDetector.s"
+	@echo "... src/Driver/Driver.o"
+	@echo "... src/Driver/Driver.i"
+	@echo "... src/Driver/Driver.s"
 .PHONY : help
 
 

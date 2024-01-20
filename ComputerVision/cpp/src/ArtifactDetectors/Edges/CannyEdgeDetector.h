@@ -44,7 +44,7 @@ Mat sobelFilterEdgeTransformWithNonMaxSupression(Mat &img) {
       }
       gradDir.at<double>(i, j) *= (180.0 / M_PI);
       gradDir.at<double>(i, j) = abs(gradDir.at<double>(i, j));
-      gradMag.at<u_char>(i, j) = static_cast<u_char>(tval);
+      gradMag.at<u_char>(i, j) = static_cast<u_char>(min(255.0, tval));
     }
   }
   Mat finalImg(trows, tcols, CV_8U);
@@ -167,18 +167,6 @@ Mat getCannyEdgesImg(Mat &img) {
     edgeTracking(point.first, point.second, result);
   }
   return result;
-}
-
-int main() {
-  string imPath =
-      "/home/panirpal/workspace/Projects/ComputerVision/data/home.jpg";
-  Mat img = imread(imPath, IMREAD_GRAYSCALE);
-  if (!img.empty()) {
-    Mat out = getCannyEdgesImg(img);
-    displayImage(out);
-  } else
-    cerr << "image not found! exiting...";
-  return 0;
 }
 
 #endif

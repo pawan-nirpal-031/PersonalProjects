@@ -3,18 +3,19 @@
 
 #include "Core.h"
 
-void displayImage(Mat &img, unsigned int time = 0, string title = "frame") {
+static void displayImage(Mat &img, unsigned int time = 0,
+                         string title = "frame") {
   imshow(title, img);
   waitKey(time);
 }
 
-bool isValidPoint(Mat &img, int x, int y) {
+static bool isValidPoint(Mat &img, int x, int y) {
   int rows = img.rows;
   int cols = img.cols;
   return (x >= 0 and x < rows and y >= 0 and y < cols);
 }
 
-void performDiff(Mat img1, Mat img2) {
+static void performDiff(Mat img1, Mat img2) {
   int rows = img1.rows;
   int cols = img2.cols;
   Mat diff(rows, cols, CV_8U);
@@ -31,7 +32,7 @@ void performDiff(Mat img1, Mat img2) {
   displayImage(diff, 0, "diff image");
 }
 
-int getValIntOf(Mat &img, int x, int y) {
+static int getValIntOf(Mat &img, int x, int y) {
   return static_cast<int>(img.at<u_char>(x, y));
 }
 

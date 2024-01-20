@@ -1,6 +1,6 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/MachineVision.dir/src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.o"
-  "CMakeFiles/MachineVision.dir/src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.o.d"
+  "CMakeFiles/MachineVision.dir/src/Driver/Driver.cpp.o"
+  "CMakeFiles/MachineVision.dir/src/Driver/Driver.cpp.o.d"
   "MachineVision"
   "MachineVision.pdb"
 )

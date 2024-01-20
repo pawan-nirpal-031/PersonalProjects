@@ -3,7 +3,7 @@
 
 #include "../Core/Core.h"
 
-vector<vector<double>> getGuassianKernal(int size, double sigma) {
+static vector<vector<double>> getGuassianKernal(int size, double sigma) {
   vector<vector<double>> Kernal(size, vector<double>(size, 0.0));
   double sum = 0.0;
   int center = size / 2;

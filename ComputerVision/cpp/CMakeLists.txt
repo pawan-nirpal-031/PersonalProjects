@@ -14,8 +14,10 @@ set(SOURCES
     src/Utils/Core/Core.h
     src/Utils/Kernals/GaussianKernal.h
     src/BasicTransforms/GaussianTransform.h
-    src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp
+    src/ArtifactDetectors/Edges/CannyEdgeDetector.h
+    src/ArtifactDetectors/Corners/HarrisCornerDetector.h
     src/BasicTransforms/MiscTransforms.h
+    src/Driver/Driver.cpp
 )
 
 # Find OpenCV (assuming it's used in your project)
@@ -36,4 +38,5 @@ target_compile_options(MachineVision PRIVATE
     -march=native    # Generate code for the host machine's architecture
     -Wall    # Enable most warning messages
     # Add any other optimization flags you prefer
+    #-Rpass=slp-vectorizer
 )

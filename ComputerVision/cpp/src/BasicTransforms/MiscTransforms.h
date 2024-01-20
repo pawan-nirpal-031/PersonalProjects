@@ -129,7 +129,7 @@ void histogramEqualization(Mat &img) {
     for (int j = 0; j < tcols; j++) {
       int pixelVal = static_cast<int>(img.at<u_char>(i, j));
       int tpixelVal = cumulativeDistFunc[pixelVal];
-      transformed.at<u_char>(i, j) = static_cast<u_char>(tpixelVal);
+      transformed.at<u_char>(i, j) = static_cast<u_char>(min(255.0, tpixelVal));
     }
   }
   displayImage(transformed);
@@ -151,7 +151,7 @@ void verticalEdgeFilterTransform(Mat &img) {
                          static_cast<int>(img.at<u_char>(i + x, j + y)));
         }
       }
-      transformed.at<u_char>(i, j) = static_cast<u_char>(tval + 255);
+      transformed.at<u_char>(i, j) = static_cast<u_char>(min(255.0, tval));
     }
   }
   displayImage(transformed);
@@ -173,7 +173,7 @@ void horizontalEdgeFilterTransform(Mat &img) {
                          static_cast<int>(img.at<u_char>(i + x, j + y)));
         }
       }
-      transformed.at<u_char>(i, j) = static_cast<u_char>(tval + 255);
+      transformed.at<u_char>(i, j) = static_cast<u_char>(min(255.0, tval));
     }
   }
   displayImage(transformed);
@@ -194,7 +194,7 @@ Mat medianFilter(Mat &img) {
         }
       }
       sort(median.begin(), median.end());
-      transformed.at<u_char>(i, j) = static_cast<u_char>(median[4]);
+      transformed.at<u_char>(i, j) = static_cast<u_char>(min(255.0, median[4]));
     }
   }
   displayImage(transformed);

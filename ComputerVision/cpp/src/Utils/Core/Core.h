@@ -9,7 +9,7 @@
 using namespace std;
 using namespace cv;
 
-Mat Convolution(Mat &img, vector<vector<double>> filter) {
+static Mat Convolution(Mat &img, vector<vector<double>> filter) {
   int FiltSize = filter.size();
   int trows = img.rows - FiltSize + 1;
   int tcols = img.cols - FiltSize + 1;
@@ -23,7 +23,7 @@ Mat Convolution(Mat &img, vector<vector<double>> filter) {
                          static_cast<double>(img.at<u_char>(i + x, j + y)));
         }
       }
-      transformed.at<u_char>(i, j) = static_cast<u_char>(tval);
+      transformed.at<u_char>(i, j) = static_cast<u_char>(min(255.0, tval));
     }
   }
   return (transformed);
@@ -59,6 +59,6 @@ Mat Convolution(Mat &img, vector<vector<double>> filter) {
 // expensive, seperablity allows us in some cases to bring this computation down
 // to (2k * n^2) by performing 1d horizontal convolution followd by 1d vertial
 // convolution having the same effect as the k^2 computations per pixel at end.
-void FastConvolution(Mat &img, vector<vector<double>> filter) {}
+static void FastConvolution(Mat &img, vector<vector<double>> filter) {}
 
 #endif

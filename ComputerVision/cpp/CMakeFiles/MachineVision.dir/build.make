@@ -69,28 +69,28 @@ include CMakeFiles/MachineVision.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/MachineVision.dir/flags.make
 
-CMakeFiles/MachineVision.dir/src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.o: CMakeFiles/MachineVision.dir/flags.make
-CMakeFiles/MachineVision.dir/src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.o: src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp
-CMakeFiles/MachineVision.dir/src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.o: CMakeFiles/MachineVision.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/panirpal/workspace/Projects/ComputerVision/cpp/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/MachineVision.dir/src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.o"
-	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/MachineVision.dir/src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.o -MF CMakeFiles/MachineVision.dir/src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.o.d -o CMakeFiles/MachineVision.dir/src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.o -c /home/panirpal/workspace/Projects/ComputerVision/cpp/src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp
+CMakeFiles/MachineVision.dir/src/Driver/Driver.cpp.o: CMakeFiles/MachineVision.dir/flags.make
+CMakeFiles/MachineVision.dir/src/Driver/Driver.cpp.o: src/Driver/Driver.cpp
+CMakeFiles/MachineVision.dir/src/Driver/Driver.cpp.o: CMakeFiles/MachineVision.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/panirpal/workspace/Projects/ComputerVision/cpp/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/MachineVision.dir/src/Driver/Driver.cpp.o"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/MachineVision.dir/src/Driver/Driver.cpp.o -MF CMakeFiles/MachineVision.dir/src/Driver/Driver.cpp.o.d -o CMakeFiles/MachineVision.dir/src/Driver/Driver.cpp.o -c /home/panirpal/workspace/Projects/ComputerVision/cpp/src/Driver/Driver.cpp
 
-CMakeFiles/MachineVision.dir/src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/MachineVision.dir/src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.i"
-	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/panirpal/workspace/Projects/ComputerVision/cpp/src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp > CMakeFiles/MachineVision.dir/src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.i
+CMakeFiles/MachineVision.dir/src/Driver/Driver.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/MachineVision.dir/src/Driver/Driver.cpp.i"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/panirpal/workspace/Projects/ComputerVision/cpp/src/Driver/Driver.cpp > CMakeFiles/MachineVision.dir/src/Driver/Driver.cpp.i
 
-CMakeFiles/MachineVision.dir/src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/MachineVision.dir/src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.s"
-	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/panirpal/workspace/Projects/ComputerVision/cpp/src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp -o CMakeFiles/MachineVision.dir/src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.s
+CMakeFiles/MachineVision.dir/src/Driver/Driver.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/MachineVision.dir/src/Driver/Driver.cpp.s"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/panirpal/workspace/Projects/ComputerVision/cpp/src/Driver/Driver.cpp -o CMakeFiles/MachineVision.dir/src/Driver/Driver.cpp.s
 
 # Object files for target MachineVision
 MachineVision_OBJECTS = \
-"CMakeFiles/MachineVision.dir/src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.o"
+"CMakeFiles/MachineVision.dir/src/Driver/Driver.cpp.o"
 
 # External object files for target MachineVision
 MachineVision_EXTERNAL_OBJECTS =
 
-MachineVision: CMakeFiles/MachineVision.dir/src/ArtifactDetectors/Edges/CannyEdgeDetector.cpp.o
+MachineVision: CMakeFiles/MachineVision.dir/src/Driver/Driver.cpp.o
 MachineVision: CMakeFiles/MachineVision.dir/build.make
 MachineVision: /usr/local/lib/libopencv_highgui.so.4.8.0
 MachineVision: /usr/local/lib/libopencv_ml.so.4.8.0
