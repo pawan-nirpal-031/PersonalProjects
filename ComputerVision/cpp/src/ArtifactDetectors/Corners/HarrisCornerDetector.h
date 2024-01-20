@@ -5,6 +5,8 @@
 #include "../../Utils/Core/Core.h"
 #include "../../Utils/Core/Utils.h"
 
+// This implmn somehow ends up being a really good edge detector. This needs to be refactored and fixed as per : https://stackoverflow.com/questions/77847011/implementing-harris-corner-detector-by-following-standard-material-it-ends-up/77847391#77847391
+
 double computeCornerResponseFunc(vector<vector<double>> &StructMat) {
   double det =
       StructMat[0][0] * StructMat[1][1] - StructMat[0][1] * StructMat[1][0];
