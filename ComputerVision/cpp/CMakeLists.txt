@@ -36,7 +36,6 @@ target_link_libraries(MachineVision ${OpenCV_LIBS})
 target_compile_options(MachineVision PRIVATE
     -O3    # Optimization level 3
     -march=native    # Generate code for the host machine's architecture
-    -Wall    # Enable most warning messages
     # Add any other optimization flags you prefer
     #-Rpass=slp-vectorizer
 )

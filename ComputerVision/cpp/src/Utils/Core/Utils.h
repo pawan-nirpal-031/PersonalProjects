@@ -52,5 +52,13 @@ Mat getGrayScaleImage(Mat &img) {
   }
   return Gray;
 }
+//  oldMin,  oldMax,  newMin,  newMax,  oldVal
+double getNormalizedValue(double oldMin, double oldMax, double newMin,
+                          double newMax, double oldVal) {
+  double oldRange = (oldMax - oldMin);
+  double newRange = (newMax - newMin);
+  double newVal = (newMin + ((newRange * (oldVal - oldMin)) / (oldRange)));
+  return newVal;
+}
 
 #endif

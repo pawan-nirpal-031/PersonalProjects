@@ -140,8 +140,9 @@ void edgeTracking(int u, int v, Mat &img) {
   }
 }
 
-Mat getCannyEdgesImg(Mat &img) {
-  Mat guassian = guassianFilterTransform(img);
+// Improve Canny Edge detector to work on several images.
+Mat getCannyEdges(Mat &img) {
+  Mat guassian = guassianFilterTransform(img, 1.2);
   Mat sobelAndNMSImg = sobelFilterEdgeTransformWithNonMaxSupression(guassian);
   int rows = sobelAndNMSImg.rows;
   int cols = sobelAndNMSImg.cols;
