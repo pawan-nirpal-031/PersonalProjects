@@ -3,13 +3,12 @@
 
 int main() {
   string imPath =
-      "/home/panirpal/workspace/Projects/ComputerVision/data/images/chess2.jpg";
-  Mat img = imread(imPath, IMREAD_GRAYSCALE);
+      "/home/panirpal/workspace/Projects/ComputerVision/data/images/draw.jpg";
+  Mat img = imread(imPath);
   if (!img.empty()) {
     displayImage(img);
-    Mat gaussian = guassianFilterTransform(img, 1.5);
-    // Mat out = detectHarrisCornersUpd(gaussian);
-    displayImage(gaussian);
+    HarrisCornerDetector().detectHarrisCorners(img);
+    displayImage(img);
   } else
     cerr << "image not found! exiting...";
 }

@@ -32,8 +32,12 @@ static void performDiff(Mat img1, Mat img2) {
   displayImage(diff, 0, "diff image");
 }
 
-static int getValIntOf(Mat &img, int x, int y) {
+static int getIntValOf(Mat &img, int x, int y) {
   return static_cast<int>(img.at<u_char>(x, y));
+}
+
+static double getDoubleValOf(Mat &img, int x, int y) {
+  return static_cast<double>(img.at<u_char>(x, y));
 }
 
 Mat getGrayScaleImage(Mat &img) {
