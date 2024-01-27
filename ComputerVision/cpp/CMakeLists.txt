@@ -17,6 +17,7 @@ set(SOURCES
     src/ArtifactDetectors/Edges/CannyEdgeDetector.h
     src/ArtifactDetectors/Corners/HarrisCornerDetector.h
     src/BasicTransforms/MiscTransforms.h
+    src/ArtifactDetectors/FeatureDiscriptors/ScaleInvarientFeatureTransform.h
     src/Driver/Driver.cpp
 )
 

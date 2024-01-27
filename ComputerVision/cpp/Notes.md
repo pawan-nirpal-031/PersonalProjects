@@ -1,0 +1,1 @@
+1) Harris corner detector is not scale invarient, A gaussian pyramid post processing step is needed, by sub-sampling the image. 

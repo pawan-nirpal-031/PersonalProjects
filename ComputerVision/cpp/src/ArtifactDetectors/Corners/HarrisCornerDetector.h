@@ -219,6 +219,7 @@ public:
     GaussKernalSize = GaussianKernalSzG;
     sigma = sigmaG;
   }
+  // TODO : make harris corner detector, scale invarient.
   void detectHarrisCorners(Mat img) {
     vector<pair<int, int>> points = detectHarrisCornersDriver(img);
     for (auto point : points) {
