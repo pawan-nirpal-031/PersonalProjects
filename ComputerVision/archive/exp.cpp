@@ -184,6 +184,7 @@ Mat detectHarrisCornersUpd(Mat &img) {
 }
 
 
+
 int main() {
   string imPath =
       "/home/panirpal/workspace/Projects/ComputerVision/data/images/chess2.jpg";

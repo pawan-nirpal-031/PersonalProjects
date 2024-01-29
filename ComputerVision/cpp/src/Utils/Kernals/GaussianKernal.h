@@ -5,14 +5,7 @@
 
 static double square(double x) { return x * x; }
 
-static double computeGaussianFunc(double x, double y, double mu, double sigma) {
-  double val =
-      exp(-0.5 * ((square((x - mu) / sigma)) + square((y - mu) / sigma))) /
-      (2 * M_PI * sigma * sigma);
-  return val;
-}
-
-static vector<vector<double>> getGuassianKernal(double sigma) {
+static vector<vector<double>> getGuassianKernalNormalized(double sigma) {
   int size = 2 * ceil(3 * sigma) + 1;
   vector<vector<double>> Kernal(size, vector<double>(size, 0.0));
   double sum = 0.0;

@@ -41,8 +41,59 @@ depending on image characteristics and desired filtering effects.
 
 */
 
+vector<vector<float>>
+computeGaussianConvolution(pair<vector<vector<float>>, float> &KernalInfo,
+                           int size, vector<vector<float>> &img) {
+  int rows = img.size();
+  int cols = img[0].size();
+  vector<vector<float>> res(rows, vector<float>(cols, 0));
+  vector<vector<float>> Kernal = KernalInfo.first;
+  float normF = KernalInfo.second;
+  int hk = size / 2;
+  for (int i = 0; i < rows; i++) {
+    for (int j = 0; j < cols; j++) {
+      float val = 0.0;
+      for (int x = -hk; x <= hk; x++) {
+        for (int y = -hk; y <= hk; y++) {
+          if (isImgPoint(rows, cols, i + x, j + y)) {
+            val += Kernal[x + hk][y + hk] * (img[i + x][j + y]);
+          }
+        }
+      }
+      res[i][j] = (val / normF);
+    }
+  }
+  return res;
+}
+
+pair<vector<vector<float>>, float> computeKernalInfo(int size, float s) {
+  vector<vector<float>> Kernal(size, vector<float>(size, 0.0));
+  float sum = 0.0;
+  int center = size / 2;
+  for (int i = 0; i < size; i++) {
+    for (int j = 0; j < size; j++) {
+      Kernal[i][j] = computeGaussianFunc(i, j, center, s);
+      sum += Kernal[i][j];
+    }
+  }
+  return {Kernal, sum};
+}
+
+vector<vector<float>> computeGussianBlur(vector<vector<float>> &img, int Ksize,
+                                         float s) {
+  if (Ksize <= 0 or s == 0) {
+    return img;
+  }
+  vector<vector<float>> res;
+  pair<vector<vector<float>>, float> KernalInfo;
+  KernalInfo = computeKernalInfo(Ksize, s);
+  vector<vector<float>> gaussianFilterd =
+      computeGaussianConvolution(KernalInfo, Ksize, img);
+  return gaussianFilterd;
+}
+
 static Mat guassianFilterTransform(Mat &img, double Sigma) {
-  vector<vector<double>> filter = getGuassianKernal(Sigma);
+  vector<vector<double>> filter = getGuassianKernalNormalized(Sigma);
   int FiltSize = filter.size();
   int trows = img.rows - FiltSize + 1;
   int tcols = img.cols - FiltSize + 1;

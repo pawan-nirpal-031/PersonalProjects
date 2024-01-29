@@ -35,6 +35,7 @@ target_link_libraries(MachineVision ${OpenCV_LIBS})
 
 # Compiler optimization options
 target_compile_options(MachineVision PRIVATE
+    -g
     -O3    # Optimization level 3
     -march=native    # Generate code for the host machine's architecture
     # Add any other optimization flags you prefer

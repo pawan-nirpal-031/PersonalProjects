@@ -1,6 +1,7 @@
 #ifndef CORE
 #define CORE
 
+#include "assert.h"
 #include <cmath>
 #include <iomanip>
 #include <iostream>
@@ -10,6 +11,7 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/opencv.hpp>
 #include <vector>
+#define DEBUG false
 using namespace std;
 using namespace cv;
 

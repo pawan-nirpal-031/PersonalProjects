@@ -11,57 +11,6 @@
 
 // TODO : Improve paramterized implementation. Of this Detector.
 class HarrisCornerDetector {
-  bool isImgPoint(int rows, int cols, int x, int y) {
-    return (x >= 0 and x < rows and y >= 0 and y < cols);
-  }
-
-  static float square(float x) { return x * x; }
-
-  static float computeGaussianFunc(float x, float y, float mu, float sigma) {
-    float val =
-        exp(-0.5 * ((square((x - mu) / sigma)) + square((y - mu) / sigma))) /
-        (2 * M_PI * sigma * sigma);
-    return val;
-  }
-
-  pair<vector<vector<float>>, float> computeKernalInfo(int size, float s) {
-    vector<vector<float>> Kernal(size, vector<float>(size, 0.0));
-    float sum = 0.0;
-    int center = size / 2;
-    for (int i = 0; i < size; i++) {
-      for (int j = 0; j < size; j++) {
-        Kernal[i][j] = computeGaussianFunc(i, j, center, s);
-        sum += Kernal[i][j];
-      }
-    }
-    return {Kernal, sum};
-  }
-
-  vector<vector<float>>
-  computeGaussianConv(pair<vector<vector<float>>, float> &KernalInfo, int size,
-                      vector<vector<float>> &img) {
-    int rows = img.size();
-    int cols = img[0].size();
-    vector<vector<float>> res(rows, vector<float>(cols, 0));
-    vector<vector<float>> Kernal = KernalInfo.first;
-    float normF = KernalInfo.second;
-    int hk = size / 2;
-    for (int i = 0; i < rows; i++) {
-      for (int j = 0; j < cols; j++) {
-        float val = 0.0;
-        for (int x = -hk; x <= hk; x++) {
-          for (int y = -hk; y <= hk; y++) {
-            if (isImgPoint(rows, cols, i + x, j + y)) {
-              val += Kernal[x + hk][y + hk] * (img[i + x][j + y]);
-            }
-          }
-        }
-        res[i][j] = (val / normF);
-      }
-    }
-    return res;
-  }
-
   vector<vector<float>> getGaussianFilterImg(vector<vector<float>> &img,
                                              int fsize, float s) {
     vector<vector<float>> res;
@@ -71,7 +20,7 @@ class HarrisCornerDetector {
     }
     KernalInfo = computeKernalInfo(fsize, s);
     vector<vector<float>> gaussianFilterd =
-        computeGaussianConv(KernalInfo, fsize, img);
+        computeGaussianConvolution(KernalInfo, fsize, img);
     return gaussianFilterd;
   }
 

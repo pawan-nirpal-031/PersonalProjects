@@ -65,4 +65,36 @@ double getNormalizedValue(double oldMin, double oldMax, double newMin,
   return newVal;
 }
 
+bool isImgPoint(int rows, int cols, int x, int y) {
+  return (x >= 0 and x < rows and y >= 0 and y < cols);
+}
+
+static float square(float x) { return x * x; }
+
+static float computeGaussianFunc(float x, float y, float mu, float sigma) {
+  float val =
+      exp(-0.5 * ((square((x - mu) / sigma)) + square((y - mu) / sigma))) /
+      (2 * M_PI * sigma * sigma);
+  return val;
+}
+
+vector<vector<float>> getImageFltMatrix(Mat &img) {
+  int rows = img.rows;
+  int cols = img.cols;
+  vector<vector<float>> grayScalImg(rows, vector<float>(cols, 0));
+  for (int i = 0; i < rows; i++) {
+    for (int j = 0; j < cols; j++) {
+      if (img.channels() == 1)
+        grayScalImg[i][j] = static_cast<int>(img.at<uchar>(i, j));
+      if (img.channels() == 3) {
+        float val = (0.0722 * (img.at<Vec3b>(i, j)[0])) +
+                    (0.7152 * (img.at<Vec3b>(i, j)[1])) +
+                    (0.2126 * (img.at<Vec3b>(i, j)[2]));
+        grayScalImg[i][j] = val;
+      }
+    }
+  }
+  return grayScalImg;
+}
+
 #endif

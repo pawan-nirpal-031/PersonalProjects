@@ -6,9 +6,7 @@ CMakeFiles/MachineVision.dir/src/Driver/Driver.cpp.o: src/Driver/Driver.cpp \
   src/BasicTransforms/GaussianTransform.h \
   src/Utils/Core/Utils.h \
   src/Utils/Core/Core.h \
-  /usr/include/c++/11/cmath \
-  /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \
-  /usr/include/x86_64-linux-gnu/c++/11/bits/os_defines.h \
+  /usr/include/assert.h \
   /usr/include/features.h \
   /usr/include/features-time64.h \
   /usr/include/x86_64-linux-gnu/bits/wordsize.h \
@@ -18,6 +16,9 @@ CMakeFiles/MachineVision.dir/src/Driver/Driver.cpp.o: src/Driver/Driver.cpp \
   /usr/include/x86_64-linux-gnu/bits/long-double.h \
   /usr/include/x86_64-linux-gnu/gnu/stubs.h \
   /usr/include/x86_64-linux-gnu/gnu/stubs-64.h \
+  /usr/include/c++/11/cmath \
+  /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \
+  /usr/include/x86_64-linux-gnu/c++/11/bits/os_defines.h \
   /usr/include/x86_64-linux-gnu/c++/11/bits/cpu_defines.h \
   /usr/include/c++/11/bits/cpp_type_traits.h \
   /usr/include/c++/11/ext/type_traits.h \
@@ -340,7 +341,6 @@ CMakeFiles/MachineVision.dir/src/Driver/Driver.cpp.o: src/Driver/Driver.cpp \
   /usr/include/c++/11/backward/auto_ptr.h \
   /usr/local/include/opencv4/opencv2/core/neon_utils.hpp \
   /usr/local/include/opencv4/opencv2/core/vsx_utils.hpp \
-  /usr/include/assert.h \
   /usr/local/include/opencv4/opencv2/core/check.hpp \
   /usr/local/include/opencv4/opencv2/core/traits.hpp \
   /usr/local/include/opencv4/opencv2/core/matx.hpp \
@@ -480,6 +480,10 @@ CMakeFiles/MachineVision.dir/src/Driver/Driver.cpp.o: src/Driver/Driver.cpp \
   src/Utils/Core/Core.h \
   src/Utils/Core/Utils.h \
   src/ArtifactDetectors/Edges/CannyEdgeDetector.h \
+  src/BasicTransforms/GaussianTransform.h \
+  src/Utils/Core/Core.h \
+  src/Utils/Core/Utils.h \
+  src/ArtifactDetectors/FeatureDiscriptors/ScaleInvarientFeatureTransform.h \
   src/BasicTransforms/GaussianTransform.h \
   src/Utils/Core/Core.h \
   src/Utils/Core/Utils.h
@@ -657,8 +661,6 @@ src/ArtifactDetectors/Edges/CannyEdgeDetector.h:
 
 /usr/local/include/opencv4/opencv2/core/check.hpp:
 
-/usr/include/assert.h:
-
 /usr/local/include/opencv4/opencv2/core/vsx_utils.hpp:
 
 /usr/include/c++/11/backward/auto_ptr.h:
@@ -781,6 +783,8 @@ src/ArtifactDetectors/Edges/CannyEdgeDetector.h:
 
 /usr/lib/llvm-14/lib/clang/14.0.0/include/avx512vbmiintrin.h:
 
+src/ArtifactDetectors/FeatureDiscriptors/ScaleInvarientFeatureTransform.h:
+
 /usr/lib/llvm-14/lib/clang/14.0.0/include/avx512vlcdintrin.h:
 
 /usr/local/include/opencv4/opencv2/opencv_modules.hpp:
@@ -788,8 +792,6 @@ src/ArtifactDetectors/Edges/CannyEdgeDetector.h:
 /usr/lib/llvm-14/lib/clang/14.0.0/include/tsxldtrkintrin.h:
 
 /usr/lib/llvm-14/lib/clang/14.0.0/include/avx512vlbwintrin.h:
-
-/usr/lib/llvm-14/lib/clang/14.0.0/include/avx512vnniintrin.h:
 
 /usr/include/c++/11/bits/sstream.tcc:
 
@@ -913,14 +915,6 @@ src/ArtifactDetectors/Edges/CannyEdgeDetector.h:
 
 /usr/lib/llvm-14/lib/clang/14.0.0/include/xmmintrin.h:
 
-/usr/include/x86_64-linux-gnu/sys/select.h:
-
-/usr/include/c++/11/bits/allocator.h:
-
-src/Utils/Core/Core.h:
-
-/usr/include/c++/11/cmath:
-
 /usr/local/include/opencv4/opencv2/stitching/detail/exposure_compensate.hpp:
 
 /usr/include/x86_64-linux-gnu/c++/11/bits/c++allocator.h:
@@ -928,6 +922,12 @@ src/Utils/Core/Core.h:
 /usr/include/x86_64-linux-gnu/bits/mathcalls.h:
 
 /usr/lib/llvm-14/lib/clang/14.0.0/include/pmmintrin.h:
+
+/usr/include/c++/11/bits/allocator.h:
+
+/usr/include/c++/11/cmath:
+
+src/Utils/Core/Core.h:
 
 /usr/include/x86_64-linux-gnu/bits/endianness.h:
 
@@ -969,6 +969,10 @@ src/Utils/Core/Core.h:
 
 /usr/include/c++/11/bits/basic_string.h:
 
+/usr/local/include/opencv4/opencv2/core/fast_math.hpp:
+
+/usr/include/x86_64-linux-gnu/gnu/stubs-64.h:
+
 /usr/local/include/opencv4/opencv2/stitching/detail/util.hpp:
 
 /usr/include/x86_64-linux-gnu/bits/types.h:
@@ -977,21 +981,23 @@ src/Utils/Core/Core.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdint-intn.h:
 
-/usr/include/c++/11/cstring:
+src/Driver/Driver.cpp:
 
-/usr/include/math.h:
+/usr/include/x86_64-linux-gnu/sys/select.h:
 
-/usr/include/x86_64-linux-gnu/bits/types/__FILE.h:
+/usr/include/assert.h:
 
-/usr/include/c++/11/bits/predefined_ops.h:
+/usr/include/c++/11/bits/stl_iterator_base_types.h:
 
-/usr/include/x86_64-linux-gnu/bits/typesizes.h:
+/usr/include/c++/11/cstdlib:
 
-/usr/lib/llvm-14/lib/clang/14.0.0/include/__stddef_max_align_t.h:
+/usr/include/c++/11/bits/stl_heap.h:
 
-/usr/include/x86_64-linux-gnu/bits/types/clock_t.h:
+/usr/include/c++/11/bits/std_abs.h:
 
-/usr/local/include/opencv4/opencv2/core/version.hpp:
+/usr/include/x86_64-linux-gnu/bits/types/__locale_t.h:
+
+/usr/lib/llvm-14/lib/clang/14.0.0/include/smmintrin.h:
 
 /usr/include/c++/11/bits/stl_list.h:
 
@@ -1011,10 +1017,6 @@ src/Utils/Core/Utils.h:
 
 /usr/include/x86_64-linux-gnu/c++/11/bits/ctype_base.h:
 
-/usr/local/include/opencv4/opencv2/dnn/layer.hpp:
-
-/usr/lib/llvm-14/lib/clang/14.0.0/include/stddef.h:
-
 /usr/lib/llvm-14/lib/clang/14.0.0/include/movdirintrin.h:
 
 /usr/include/x86_64-linux-gnu/bits/timesize.h:
@@ -1031,6 +1033,10 @@ src/BasicTransforms/GaussianTransform.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/timer_t.h:
 
+/usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h:
+
+/usr/include/x86_64-linux-gnu/bits/pthread_stack_min-dynamic.h:
+
 /usr/include/c++/11/functional:
 
 /usr/include/linux/errno.h:
@@ -1038,16 +1044,6 @@ src/BasicTransforms/GaussianTransform.h:
 /usr/include/c++/11/debug/debug.h:
 
 /usr/include/features-time64.h:
-
-src/Driver/Driver.cpp:
-
-/usr/include/x86_64-linux-gnu/bits/pthread_stack_min-dynamic.h:
-
-/usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h:
-
-/usr/local/include/opencv4/opencv2/core/fast_math.hpp:
-
-/usr/include/x86_64-linux-gnu/gnu/stubs-64.h:
 
 /usr/include/c++/11/bits/cpp_type_traits.h:
 
@@ -1101,13 +1097,33 @@ src/Driver/Driver.cpp:
 
 /usr/include/x86_64-linux-gnu/bits/types/clockid_t.h:
 
+/usr/include/c++/11/bits/functexcept.h:
+
+/usr/include/c++/11/streambuf:
+
 /usr/include/x86_64-linux-gnu/bits/time64.h:
 
 /usr/include/c++/11/ctime:
 
-/usr/include/c++/11/bits/functexcept.h:
+/usr/include/x86_64-linux-gnu/asm/errno.h:
 
-/usr/include/c++/11/streambuf:
+/usr/include/x86_64-linux-gnu/sys/cdefs.h:
+
+/usr/local/include/opencv4/opencv2/core.hpp:
+
+/usr/include/c++/11/cstring:
+
+/usr/include/math.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/__FILE.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/clock_t.h:
+
+/usr/local/include/opencv4/opencv2/core/version.hpp:
+
+/usr/local/include/opencv4/opencv2/dnn/layer.hpp:
+
+/usr/lib/llvm-14/lib/clang/14.0.0/include/stddef.h:
 
 /usr/include/x86_64-linux-gnu/bits/setjmp.h:
 
@@ -1122,18 +1138,6 @@ src/Driver/Driver.cpp:
 /usr/include/c++/11/bits/concept_check.h:
 
 /usr/include/c++/11/bits/locale_classes.tcc:
-
-/usr/include/c++/11/bits/stl_iterator_base_types.h:
-
-/usr/include/c++/11/cstdlib:
-
-/usr/include/c++/11/bits/stl_heap.h:
-
-/usr/include/c++/11/bits/std_abs.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/__locale_t.h:
-
-/usr/lib/llvm-14/lib/clang/14.0.0/include/smmintrin.h:
 
 /usr/local/include/opencv4/opencv2/core/traits.hpp:
 
@@ -1171,11 +1175,13 @@ src/Driver/Driver.cpp:
 
 /usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
 
-/usr/include/x86_64-linux-gnu/sys/cdefs.h:
+/usr/include/x86_64-linux-gnu/bits/typesizes.h:
 
-/usr/local/include/opencv4/opencv2/core.hpp:
+/usr/lib/llvm-14/lib/clang/14.0.0/include/__stddef_max_align_t.h:
 
-/usr/include/x86_64-linux-gnu/asm/errno.h:
+/usr/include/c++/11/bits/predefined_ops.h:
+
+/usr/lib/llvm-14/lib/clang/14.0.0/include/avx512vnniintrin.h:
 
 /usr/include/x86_64-linux-gnu/bits/waitstatus.h:
 
@@ -1405,9 +1411,9 @@ src/Utils/Kernals/GaussianKernal.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
 
-src/ArtifactDetectors/Corners/HarrisCornerDetector.h:
-
 /usr/include/x86_64-linux-gnu/bits/types/struct_timespec.h:
+
+src/ArtifactDetectors/Corners/HarrisCornerDetector.h:
 
 /usr/lib/llvm-14/lib/clang/14.0.0/include/__wmmintrin_pclmul.h:
 
