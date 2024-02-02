@@ -177,6 +177,15 @@ public:
     initalSigma = 1;
     gKernelSize = 3;
   }
+
+  SIFT(float userK,unsigned userNumOct,unsigned userSclsPerOct,float userInitalSigma,unsigned userGaussianKernalSize){
+    k = userK;
+    numOctaves = userNumOct;
+    scalesPerOct = userSclsPerOct;
+    initalSigma = userInitalSigma;
+    gKernelSize = userGaussianKernalSize;
+  }
+
   void computeSIFT(Mat &image) {
     // get image data in float
     vector<vector<float>> img = getImageFltMatrix(image);
@@ -196,6 +205,8 @@ public:
         computeDiffOfGaussianPyramid(scaleSpacePyramid);
     vector<vector<vector<pair<int, int>>>> scaleSpaceExtremas =
         findScaleSpaceExtrma(DoGPyramid);
+    // this concludes inital scale space extrema detection step. Generates basic
+    // keypoints which can be later pruned.
 #if DEBUG
     unsigned count = 0;
     for (int oct = 0; oct < scaleSpaceExtremas.size(); oct++) {
@@ -210,7 +221,8 @@ public:
       cout << "\n";
     }
 #endif
-  }
+
+  } // computeSIFT()
 };
 
 } // namespace MvSIFT

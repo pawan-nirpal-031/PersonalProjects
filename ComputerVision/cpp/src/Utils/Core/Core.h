@@ -11,7 +11,7 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/opencv.hpp>
 #include <vector>
-#define DEBUG false
+#define DEBUG 0
 using namespace std;
 using namespace cv;
 
