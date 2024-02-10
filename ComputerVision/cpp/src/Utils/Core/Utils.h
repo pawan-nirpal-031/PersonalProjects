@@ -15,23 +15,6 @@ static bool isValidPoint(Mat &img, int x, int y) {
   return (x >= 0 and x < rows and y >= 0 and y < cols);
 }
 
-static void performDiff(Mat img1, Mat img2) {
-  int rows = img1.rows;
-  int cols = img2.cols;
-  Mat diff(rows, cols, CV_8U);
-  bool zero = true;
-  for (int i = 0; i < rows; i++) {
-    for (int j = 0; j < cols; j++) {
-      int d = (static_cast<int>(img1.at<u_char>(i, j)) -
-               static_cast<int>(img2.at<u_char>(i, j)));
-      diff.at<u_char>(i, j) = d;
-      if (d != 0)
-        zero = false;
-    }
-  }
-  displayImage(diff, 0, "diff image");
-}
-
 static int getIntValOf(Mat &img, int x, int y) {
   return static_cast<int>(img.at<u_char>(x, y));
 }
@@ -95,6 +78,37 @@ vector<vector<float>> getImageFltMatrix(Mat &img) {
     }
   }
   return grayScalImg;
+}
+
+void plotImageMatrix(vector<vector<float>> &img) {
+  int rows = img.size();
+  int cols = img[0].size();
+  Mat image(rows, cols, CV_8U);
+  for (int i = 0; i < rows; i++) {
+    for (int j = 0; j < cols; j++) {
+      image.at<u_char>(i, j) = static_cast<u_char>((int)(img[i][j]));
+    }
+  }
+  displayImage(image);
+}
+
+void plotKeyPointsInImg(Mat &img, vector<pair<int, int>> &points) {
+  for (auto point : points) {
+    circle(img, Point(point.second, point.first), 3, Scalar(0, 255, 0), 1);
+  }
+}
+
+void logSubPatchPrint(const vector<vector<float>> &img) {
+  if (img.size() > 9 and img[0].size() > 9) {
+    cout << "START : ====================\n\n";
+    for (int i = 1; i <= subPatchSize; i++) {
+      for (int j = 1; j <= subPatchSize; j++) {
+        cout << img[i][j] << " ";
+      }
+      cout << "\n";
+    }
+    cout << "\nEND : ====================\n\n";
+  }
 }
 
 #endif

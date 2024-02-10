@@ -1,0 +1,214 @@
+--- a/ComputerVision/cpp/src/ArtifactDetectors/FeatureDiscriptors/ScaleInvarientFeatureTransform.h
++++ b/ComputerVision/cpp/src/ArtifactDetectors/FeatureDiscriptors/ScaleInvarientFeatureTransform.h
+@@ -46,6 +46,7 @@ class SIFT {
+   computeScaleSpacePyramid(vector<vector<float>> img) {
+     vector<vector<vector<vector<float>>>> scaleSpacePyramid;
+     vector<vector<float>> currentImg = img;
++    auto propTonxtOct = img;
+     for (int oct = 1; oct <= numOctaves; oct++) {
+       vector<vector<vector<float>>> octImages;
+       float sigma = initalSigma;
+@@ -53,10 +54,12 @@ class SIFT {
+         vector<vector<float>> blurredImg =
+             computeGussianBlur(currentImg, gKernelSize, sigma);
+         octImages.push_back(blurredImg);
++        currentImg = blurredImg;
+         sigma *= k;
+       }
+       scaleSpacePyramid.push_back(octImages);
+-      currentImg = downsampleImg(currentImg);
++      currentImg = downsampleImg(propTonxtOct);
++      propTonxtOct = currentImg;
+     }
+     return scaleSpacePyramid;
+   }
+@@ -95,7 +98,7 @@ class SIFT {
+     return diffOfGaussianPyrmd;
+   }
+ 
+-  // Get potential extrema for this scale.
++  // Get potential extremas for this scale.
+   vector<pair<int, int>>
+   searchInCurrentScale(int scale, vector<vector<vector<float>>> &Octave) {
+     int OSize = Octave.size();
+@@ -116,8 +119,6 @@ class SIFT {
+         for (int x = -1; x <= 1; x++) {
+           for (int y = -1; y <= 1; y++) {
+             // Skip the currentPtVal
+-            if (x == 0 and y == 0)
+-              continue;
+             maxVal = max(maxVal, middle[i + x][j + y]);
+             minVal = min(minVal, middle[i + x][j + y]);
+           }
+@@ -138,8 +139,10 @@ class SIFT {
+         }
+         // current pixel is a candidate if it is greter than maximum or lesser
+         // than minimum found.
+-        if (currPtVal > maxVal or currPtVal < minVal)
++        if (currPtVal > maxVal or currPtVal < minVal) {
+           potentialKeypoints.push_back(make_pair(i, j));
++          cout << "### Detected KeyP : " << i << " " << j << "\n";
++        }
+       }
+     }
+     return potentialKeypoints;
+@@ -168,6 +171,12 @@ class SIFT {
+     return potentialKeyPoints;
+   }
+ 
++  // vector<vector<vector<pair<float, float>>>> computeGradientPyramid(
++  //     const vector<vector<vector<pair<int, int>>>> &scaleSpaceExtremas,
++  //     const vector<vector<vector<vector<float>>>> &scaleSpacePyramid) {
++  //   vector<vector<vector<pair<float, float>>>> gradPyramid;
++  // }
++
+ public:
+   SIFT() {
+     // Scale factor Chosen to be /2 = 1.414
+@@ -178,7 +187,8 @@ public:
+     gKernelSize = 3;
+   }
+ 
+-  SIFT(float userK,unsigned userNumOct,unsigned userSclsPerOct,float userInitalSigma,unsigned userGaussianKernalSize){
++  SIFT(float userK, unsigned userNumOct, unsigned userSclsPerOct,
++       float userInitalSigma, unsigned userGaussianKernalSize) {
+     k = userK;
+     numOctaves = userNumOct;
+     scalesPerOct = userSclsPerOct;
+@@ -193,16 +203,39 @@ public:
+         computeScaleSpacePyramid(img);
+ #if DEBUG
+     for (int i = 0; i < scaleSpacePyramid.size(); i++) {
+-      cout << "Octave = " << i;
++      cout << ">>> Scale Space Pyramid Octave = " << i << "\n";
+       for (int j = 0; j < scaleSpacePyramid[i].size(); j++) {
+         cout << " Scale = " << j;
+         cout << " Img sizes = " << scaleSpacePyramid[i][j].size() << " x "
+              << scaleSpacePyramid[i][j][0].size() << "\n";
++        // plotImageMatrix(scaleSpacePyramid[i][j]);
++        // logSubPatchPrint(scaleSpacePyramid[i][j]);
+       }
+     }
++    cout << "\n";
+ #endif
+     vector<vector<vector<vector<float>>>> DoGPyramid =
+         computeDiffOfGaussianPyramid(scaleSpacePyramid);
++#if DEBUG
++    for (int oct = 0; oct < DoGPyramid.size(); oct++) {
++      auto Octave = DoGPyramid[oct];
++      cout << ">>> Diff Of Gaussian Octave = " << oct;
++      cout << " Num Scales = " << Octave.size() << "\n ";
++      for (int scl = 0; scl < Octave.size(); scl++) {
++        auto dogImg = Octave[scl];
++        // plotImageMatrix(dogImg);
++#if IMGLVLDIAGNOSIS
++        for (int i = 0; i < dogImg.size(); i++) {
++          for (int j = 0; j < dogImg[0].size(); j++) {
++            cout << dogImg[i][j] << " ";
++          }
++          cout << "\n";
++        }
++        cout << "\n\n";
++#endif
++      }
++    }
++#endif
+     vector<vector<vector<pair<int, int>>>> scaleSpaceExtremas =
+         findScaleSpaceExtrma(DoGPyramid);
+     // this concludes inital scale space extrema detection step. Generates basic
+@@ -210,7 +243,7 @@ public:
+ #if DEBUG
+     unsigned count = 0;
+     for (int oct = 0; oct < scaleSpaceExtremas.size(); oct++) {
+-      cout << ">>> Octave = " << oct;
++      cout << ">>> Scale Space Extrema Octave = " << oct << "\n";
+       auto Octave = scaleSpaceExtremas[oct];
+       cout << " Num Scales = " << Octave.size();
+       for (int sc = 0; sc < Octave.size(); sc++) {
+@@ -222,6 +255,13 @@ public:
+     }
+ #endif
+ 
++#if KEYPOINTPLT
++    for (auto &Octave : scaleSpaceExtremas) {
++      for (auto &scale : Octave) {
++        plotKeyPointsInImg(ClrCpy, scale);
++      }
++    }
++#endif
+   } // computeSIFT()
+ };
+ 
+diff --git a/ComputerVision/cpp/src/Driver/Driver.cpp b/ComputerVision/cpp/src/Driver/Driver.cpp
+index 8256720..2de7e8e 100644
+--- a/ComputerVision/cpp/src/Driver/Driver.cpp
++++ b/ComputerVision/cpp/src/Driver/Driver.cpp
+@@ -9,7 +9,6 @@ int main() {
+   if (!img.empty()) {
+     displayImage(img);
+     MvSIFT::SIFT().computeSIFT(img);
+-    // displayImage(img);
+   } else
+     cerr << "image not found! exiting...";
+ }
+\ No newline at end of file
+diff --git a/ComputerVision/cpp/src/Utils/Core/Core.h b/ComputerVision/cpp/src/Utils/Core/Core.h
+index 261f950..d37ad6b 100644
+--- a/ComputerVision/cpp/src/Utils/Core/Core.h
++++ b/ComputerVision/cpp/src/Utils/Core/Core.h
+@@ -12,9 +12,15 @@
+ #include <opencv2/opencv.hpp>
+ #include <vector>
+ #define DEBUG 0
++#define IMGLVLDIAGNOSIS 0
++#define KEYPOINTPLT 0
+ using namespace std;
+ using namespace cv;
+ 
++// Use subPatchSize x subPatchSize image in the orignal image to obtain
++// debugging info.
++const unsigned subPatchSize = 5;
++
+ static Mat Convolution(Mat &img, vector<vector<double>> filter) {
+   int FiltSize = filter.size();
+   int trows = img.rows - FiltSize + 1;
+diff --git a/ComputerVision/cpp/src/Utils/Core/Utils.h b/ComputerVision/cpp/src/Utils/Core/Utils.h
+index f17814e..28ef2eb 100644
+--- a/ComputerVision/cpp/src/Utils/Core/Utils.h
++++ b/ComputerVision/cpp/src/Utils/Core/Utils.h
+@@ -97,4 +97,35 @@ vector<vector<float>> getImageFltMatrix(Mat &img) {
+   return grayScalImg;
+ }
+ 
++void plotImageMatrix(vector<vector<float>> &img) {
++  int rows = img.size();
++  int cols = img[0].size();
++  Mat image(rows, cols, CV_8U);
++  for (int i = 0; i < rows; i++) {
++    for (int j = 0; j < cols; j++) {
++      image.at<u_char>(i, j) = static_cast<u_char>((int)(img[i][j]));
++    }
++  }
++  displayImage(image);
++}
++
++void plotKeyPointsInImg(Mat &img, vector<pair<int, int>> &points) {
++  for (auto point : points) {
++    circle(img, Point(point.second, point.first), 3, Scalar(0, 255, 0), 1);
++  }
++}
++
++void logSubPatchPrint(const vector<vector<float>> &img) {
++  if (img.size() > 9 and img[0].size() > 9) {
++    cout << "START : ====================\n\n";
++    for (int i = 1; i <= subPatchSize; i++) {
++      for (int j = 1; j <= subPatchSize; j++) {
++        cout << img[i][j] << " ";
++      }
++      cout << "\n";
++    }
++    cout << "\nEND : ====================\n\n";
++  }
++}
+#endif
+\ No newline at end of file

@@ -11,9 +11,15 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/opencv.hpp>
 #include <vector>
-#define DEBUG 0
+#define DEBUG 1
+#define IMGLVLDIAGNOSIS 0
+#define KEYPOINTPLT 0
 using namespace std;
 using namespace cv;
+
+// Use subPatchSize x subPatchSize image in the orignal image to obtain
+// debugging info.
+const unsigned subPatchSize = 6;
 
 static Mat Convolution(Mat &img, vector<vector<double>> filter) {
   int FiltSize = filter.size();
