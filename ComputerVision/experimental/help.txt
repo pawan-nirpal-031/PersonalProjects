@@ -1,0 +1,5 @@
+Linkdin : 
+
+Any computer vision and image processing experts/enthusiasts, I've been fascinated by vision algorithms for a while and started tinkering with some over weekends, If you could be kind enough to help me understand where it is I'm going wrong, I'd greatly appreciate it ( apparently StackOverflow always 
+
+tends to beat the passion out of beginners ) So fortunately or unfortunately I've had to resort to LinkedIn for help, I've been trying to understand the SIFT feature detection algorithm and what better way to try to understand it by practice, I've managed to get to the point of detecting scale space extrema, But I'm struggling with the refinement of these extrema locations, The output I get is nowhere the Open CV SIFT API result, Even if it manages to get up to an 80% accuracy I'll consider it done. ( The implementation is however very naive, but then again this is only for educational purposes ) I give a reference to the stack overflow question which did not get any 

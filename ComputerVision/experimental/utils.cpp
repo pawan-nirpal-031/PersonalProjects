@@ -152,12 +152,13 @@ void checkForSucessiveBlur(Mat &image){
 }
 
 int main() {
-  string imPath =
-      "/home/panirpal/workspace/Projects/ComputerVision/data/images/astro1.jpg";
-  Mat img = imread(imPath, IMREAD_GRAYSCALE);
-  if (!img.empty()) {
-    checkForSucessiveBlur(img);
-  } else
-    cerr << "image not found! exiting...";
+  // string imPath =
+  //     "/home/panirpal/workspace/Projects/ComputerVision/data/images/astro1.jpg";
+  // Mat img = imread(imPath, IMREAD_GRAYSCALE);
+  // if (!img.empty()) {
+  //   checkForSucessiveBlur(img);
+  // } else
+  //   cerr << "image not found! exiting...";
+  
   return 0;
 }

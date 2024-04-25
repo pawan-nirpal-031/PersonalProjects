@@ -6,6 +6,9 @@
 #include <queue>
 #include <thread>
 #include <vector>
+#include <GL/gl.h>
+#include <GL/glut.h>
+#include <GL/glu.h>
 #ifdef _WIN32
 #include <conio.h>
 #elif __linux__
@@ -38,6 +41,7 @@ private:
   vector<vector<CellType>> board;
   bool hasBeenInitalized = false;
 
+
   char getCellCharByCellType(CellType Cty) const {
     switch (Cty) {
     case CellType::EmptyT:
@@ -60,6 +64,9 @@ private:
   }
 
 public:
+   void drawCell(CellType cty) const{
+    cout<<"|"<<getCellCharByCellType(cty)<<"|";
+  }
   // Left, Dowm, Right, Up
   vector<pair<int, int>> Visit4Neighbours = {{0, -1}, {1, 0}, {0, 1}, {-1, 0}};
   GameBoard(int rows, int cols) {
@@ -74,7 +81,7 @@ public:
       for (int i = 0; i < 7; i++)
         cout << " ";
       for (int j = 0; j < cols; j++) {
-        cout << getCellCharByCellType(board[i][j]) << ' ';
+        drawCell(board[i][j]);
       }
       cout << '\n';
     }
@@ -1017,27 +1024,21 @@ private:
     cout << "Please enter valid movement...\n";
     return input;
   }
-
-  pair<unsigned,unsigned> getRandomDirection(unsigned urow,unsigned ucol){
-    unsigned dir = rand()%4;
-    auto add = state->board->Visit4Neighbours.at(dir);
-    return make_pair(add.first+urow,add.second+ucol);
-  }
   
-  void generateMazeRecursivePolicy(GameBoard &board,vector<vector<bool>> &visited,unsigned urow,unsigned ucol){
-    if(visited[urow][ucol])
-      return;
+  void generateMazeRecursively(GameBoard &board,vector<vector<bool>> &visited,unsigned urow,unsigned ucol){
+    board.updateCell(urow,ucol,CellType::WallT);
     visited[urow][ucol] = true;
-    board.updateCell(urow,ucol,CellType::PelletT);
-    auto randDir = getRandomDirection(urow,ucol);
-    while(true){
-      randDir = getRandomDirection(urow,ucol);
-      if(board.isValidCell(randDir.first,randDir.second))
-        break;
+    vector<pair<int,int>> possibleNext;
+    for(auto offset : board.Visit4Neighbours){
+      int nxtR = urow + offset.first;
+      int nxtC = ucol + offset.second;
+      if(board.isValidCell(nxtR,nxtC) and (not visited[nxtR][nxtC]))
+        possibleNext.push_back(make_pair(nxtR,nxtC));
     }
-    if(board.isValidCell(randDir.first,randDir.second) and (not visited[randDir.first][randDir.second])){
-      generateMazeRecursivePolicy(board,visited,randDir.first,randDir.second);
-    }
+    if(possibleNext.size()==0)
+      return;
+    auto nextLoc = possibleNext[rand()%possibleNext.size()];
+    generateMazeRecursively(board,visited,nextLoc.first,nextLoc.second);
   }
 
 public:
@@ -1048,10 +1049,10 @@ public:
     vector<vector<bool>> visited(board.getRows(),vector<bool>(board.getCols(),false));
     for(int i = 0;i<board.getRows();i++){
       for(int j =0;j<board.getCols();j++){
-        board.updateCell(i,j,CellType::WallT);
+        board.updateCell(i,j,CellType::EmptyT);
       }
     }
-    generateMazeRecursivePolicy(board,visited,0,0);
+    generateMazeRecursively(board,visited,3,2);
     board.renderBoard();
   }
 
@@ -1120,50 +1121,21 @@ public:
     }
   }
 
-  // void getAndProcessInput(){
-  //     char input = getKeyPress();
-  //     switch(input){
-  //         case 'w': {
-  //             pac.move(Direction::Up,board);
-  //             break;
-  //         }
-
-  //         case 's': {
-  //             pac.move(Direction::Down,board);
-  //             break;
-  //         }
-
-  //         case 'd': {
-  //             pac.move(Direction::Right,board);
-  //             break;
-  //         }
-
-  //         case 'a': {
-  //             pac.move(Direction::Left,board);
-  //             break;
-  //         }
-
-  //         default:
-  //             assert("unsupported action");
-  //     }
-  // }
-
   void updateGameState() {}
 
   void render() {
 #ifdef _WIN32
     system("cls");
 #elif __linux__
-    system("clear");
+    //system("clear");
 #endif
     // TODO : Add rendering of score, lives left.
     state->renderGameState();
   }
 
   void runGame() {
-    // setNonBlocking();
-    //initalizeGameMazeGenerationPolicy();
-    initalizeGameSimplestPolicy();
+    initalizeGameMazeGenerationPolicy();
+    //initalizeGameSimplestPolicy();
     while (state->pac->pacLifeStatus()) {
       getAndProcessInputClassic();
       state->updateGameState();
@@ -1175,12 +1147,12 @@ public:
       render();
       this_thread::sleep_for(chrono::microseconds(100));
     }
-    // restoreBlocking();
   }
 };
 
 int main() {
   // Size of the board.
+  //GameBoard(5,5).drawCell(CellType::PacmanT);
   int bsize;
   cin>>bsize;
   GameBoard *board = new GameBoard(bsize,bsize);
@@ -1190,3 +1162,10 @@ int main() {
   Game g(state);
   g.runGame();
 }
+
+/*
+
+g++ -O3 pacman.cpp  -lGL -lGLU -lglut  -o pacman
+
+*/
+

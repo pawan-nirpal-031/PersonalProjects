@@ -122,9 +122,9 @@ std::tuple<float, float, float> fit_quadratic(Keypoint& kp,
     int x = kp.i, y = kp.j;
 
     // gradient 
-    g1 = (next.get_pixel(x, y, 0) - prev.get_pixel(x, y, 0)) * 0.5;
-    g2 = (img.get_pixel(x+1, y, 0) - img.get_pixel(x-1, y, 0)) * 0.5;
-    g3 = (img.get_pixel(x, y+1, 0) - img.get_pixel(x, y-1, 0)) * 0.5;
+    g1 = (next.get_pixel(x, y, 0) - prev.get_pixel(x, y, 0)) * 0.5; // gs
+    g2 = (img.get_pixel(x+1, y, 0) - img.get_pixel(x-1, y, 0)) * 0.5; // gx
+    g3 = (img.get_pixel(x, y+1, 0) - img.get_pixel(x, y-1, 0)) * 0.5; // gy
 
     // hessian
     h11 = next.get_pixel(x, y, 0) + prev.get_pixel(x, y, 0) - 2*img.get_pixel(x, y, 0);
@@ -132,8 +132,10 @@ std::tuple<float, float, float> fit_quadratic(Keypoint& kp,
     h33 = img.get_pixel(x, y+1, 0) + img.get_pixel(x, y-1, 0) - 2*img.get_pixel(x, y, 0);
     h12 = (next.get_pixel(x+1, y, 0) - next.get_pixel(x-1, y, 0)
           -prev.get_pixel(x+1, y, 0) + prev.get_pixel(x-1, y, 0)) * 0.25;
+
     h13 = (next.get_pixel(x, y+1, 0) - next.get_pixel(x, y-1, 0)
           -prev.get_pixel(x, y+1, 0) + prev.get_pixel(x, y-1, 0)) * 0.25;
+
     h23 = (img.get_pixel(x+1, y+1, 0) - img.get_pixel(x+1, y-1, 0)
           -img.get_pixel(x-1, y+1, 0) + img.get_pixel(x-1, y-1, 0)) * 0.25;
     
@@ -191,7 +193,7 @@ bool refine_or_discard_keypoint(Keypoint& kp, const std::vector<Image>& octave,
                                 float contrast_thresh, float edge_thresh)
 {
     int k = 0;
-    bool kp_is_valid = false; 
+    bool kp_is_valid = false;
     while (k++ < MAX_REFINEMENT_ITERS) {
         auto [offset_s, offset_x, offset_y] = fit_quadratic(kp, octave, kp.scale);
 

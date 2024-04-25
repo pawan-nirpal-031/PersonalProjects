@@ -2,6 +2,8 @@
 #include <vector>
 #include <cmath>
 
+using std::cout;
+
 // Function to generate Laplacian of Gaussian kernel
 std::vector<std::vector<float>> laplacianOfGaussianKernel(int size, float sigma) {
     std::vector<std::vector<float>> laplacianKernel(size, std::vector<float>(size, 0.0));
@@ -21,20 +23,22 @@ std::vector<std::vector<float>> laplacianOfGaussianKernel(int size, float sigma)
 }
 
 int main() {
-    int size = 5; // Size of the kernel (odd)
-    float sigma = 1.0; // Standard deviation of the Gaussian
+    // int size = 5; // Size of the kernel (odd)
+    // float sigma = 1.0; // Standard deviation of the Gaussian
 
-    // Generate Laplacian of Gaussian kernel
-    std::vector<std::vector<float>> laplacian = laplacianOfGaussianKernel(size, sigma);
+    // // Generate Laplacian of Gaussian kernel
+    // std::vector<std::vector<float>> laplacian = laplacianOfGaussianKernel(size, sigma);
 
-    // Output the Laplacian of Gaussian kernel
-    std::cout << "Laplacian of Gaussian Kernel:" << std::endl;
-    for (const auto& row : laplacian) {
-        for (float value : row) {
-            std::cout << value << "\t";
-        }
-        std::cout << std::endl;
-    }
-
+    // // Output the Laplacian of Gaussian kernel
+    // std::cout << "Laplacian of Gaussian Kernel:" << std::endl;
+    // for (const auto& row : laplacian) {
+    //     for (float value : row) {
+    //         std::cout << value << "\t";
+    //     }
+    //     std::cout << std::endl;
+    // }
+    if(-1.41021 < 0.03){
+        cout<<"yes";
+    }else cout<<"no";
     return 0;
 }

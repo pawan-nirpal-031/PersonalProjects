@@ -1,0 +1,18 @@
+  inline float computeU1(int k,int l,matrix &u){
+    unsigned M = u.size();
+    unsigned N = u[0].size();
+    unsigned smk = min(k%(2*M),(2*M - 1 - k%(2*M)));
+    unsigned snl = min(l%(2*N), (2*N - 1 - l%(2*N)));
+    assert((smk>=0 and smk<=M-1 and snl>=0 and snl<=N-1) and "Invalid index into U");
+    cout<<smk<<" : "<<snl<<"\n";
+    return u[smk][snl];
+  }
+
+  inline float computeInterpolationVal(float x,float y,matrix &u){
+
+    float val = (x - floor(x))*(y - floor(y))*(computeU1((int)floor(x)+1,(int)floor(y)+1,u)) + 
+                (1 + floor(x) - x)*(y - floor(y))*(computeU1((int)floor(x),(int)floor(y) + 1,u)) + 
+                (x - floor(x)*(1 + floor(y) - y))*(computeU1((int)floor(x)+1,(int)floor(y),u)) + 
+                (1 + floor(x) - x)*(1 + floor(y) - y)*computeU1(floor(x),floor(y),u);
+    return val;
+  }

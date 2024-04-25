@@ -1,11 +1,0 @@
---2024-02-01 20:12:43--  https://www.pdfdrive.com/download.pdf?id=31294228
-Resolving www.pdfdrive.com (www.pdfdrive.com)... 104.21.37.10, 172.67.202.44, 2606:4700:3034::ac43:ca2c, ...
-Connecting to www.pdfdrive.com (www.pdfdrive.com)|104.21.37.10|:443... connected.
-HTTP request sent, awaiting response... 200 OK
-Length: unspecified [text/html]
-Saving to: ‘download.pdf?id=31294228’
-
-         download     [<=>         ]       0  --.-KB/s               download.pdf?id=3     [ <=>        ]      94  --.-KB/s    in 0s      
-
-2024-02-01 20:12:45 (27.5 MB/s) - ‘download.pdf?id=31294228’ saved [94]
-
