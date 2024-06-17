@@ -10,7 +10,7 @@ class NeuralNet {
   double learningRate;
 
   Matrix computeActivationFunction(Matrix &weight, Matrix &bais,
-                                   Matrix &input) {
+                                   Matrix input) {
     MatrixOpreations matOps;
     Matrix product = matOps.multiplyMatrices(input, weight);
     Matrix baisSum = matOps.addMatrices(product, bais);
@@ -63,8 +63,11 @@ public:
     delta = matOps.elementWiseProduct(delta, sigmodD);
     // accumulate dBais, dWeights (gradients)
     deltaBais[numLayers - 2].addToMatrix(delta);
+
+
+
     Matrix SecondLastT = matOps.transpose(layers[numLayers - 2]);
-    Matrix dWAccum = matOps.multiplyMatrices(delta, SecondLastT);
+    Matrix dWAccum = matOps.multiplyMatrices(SecondLastT,delta);
     deltaWeights[numLayers - 2].addToMatrix(dWAccum);
 
     for (int i = numLayers - 3; i >= 0; i--) {
@@ -90,7 +93,7 @@ public:
   }
 
   void train(vector<Matrix> &inputs, vector<Matrix> &outputs) {
-    cout << "training started...\n";
+    cerr << "training started...\n";
     for (int i = 0; i < numLayers - 1; i++) {
       deltaWeights[i].setZero();
       deltaBais[i].setZero();
@@ -99,6 +102,9 @@ public:
     for (int i = 0; i < inputs.size(); i++) {
       Matrix input(inputs[i]);
       Matrix output(outputs[i]);
+      #if DMODE
+        cerr<<" Inp size : "<<input.getRows()<<" x "<<input.getCols()<<" | Output Size : "<<output.getRows()<<" x "<<output.getCols()<<"\n";
+      #endif
       backpropagation(input, output);
     }
     return;

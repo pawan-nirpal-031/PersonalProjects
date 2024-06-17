@@ -39,7 +39,9 @@ void parseTrainData() {
     trainInput[i] = input;
     trainOutput[i] = output;
   }
-
+  #if DMODE
+    cerr<<"Loaded data inp size "<<trainInput.size()<<" out size "<<trainOutput.size()<<"\n";
+  #endif
   cerr << "Training data loaded.\n";
 }
 
@@ -55,7 +57,7 @@ void trainingDriver(NeuralNet &model) {
     trainAtRandomIdx[i] = i;
   for (int e = 0; e < epochs; e++) {
     cerr << "Epoch : " << e << "\n";
-    randomShuffle(trainAtRandomIdx);
+    //randomShuffle(trainAtRandomIdx);
     for (int i = 0; i < 42000; i += BATCH_SIZE) {
       vector<Matrix> inputs(BATCH_SIZE), outputs(BATCH_SIZE);
       for (int j = 0; j < BATCH_SIZE; j++) {

@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <bits/stdc++.h>
 using namespace std;
+#define DMODE false
 
 class CoreMathUtils {
   unsigned long x, y, z, w;
@@ -150,7 +151,7 @@ public:
 
   Matrix elementWiseProduct(Matrix &x, Matrix &y) {
     assert(y.getRows() == x.getRows() and y.getCols() == x.getCols() and
-           "non matching dimensions for subtraction");
+           "non matching dimensions for element wise product");
     unsigned rows = x.getRows();
     unsigned cols = y.getCols();
     Matrix prod(rows, cols);
@@ -178,6 +179,7 @@ public:
   }
 
   Matrix multiplyMatrices(const Matrix &x, const Matrix &y) {
+    assert(x.getCols()==y.getRows() and "Invalid dimensions for matrix multiply");
     Matrix prod(x.getRows(), y.getCols());
     for (int i = 0; i < x.getRows(); i++) {
       for (int j = 0; j < y.getCols(); j++)
