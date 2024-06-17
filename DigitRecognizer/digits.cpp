@@ -1,8 +1,13 @@
 #include "mathutils.h"
 #include "neuralnet.h"
+#define DRIVER_AVT true
 
 const int BATCH_SIZE = 20;
 vector<Matrix> trainInput(42000), trainOutput(42000);
+
+int getTimeStamp() { return (int)(clock() * 1000 / CLOCKS_PER_SEC); }
+
+void reportTimeStamp() { cerr << "Time Stamp : " << getTimeStamp() << " ms\n"; }
 
 vector<int> extractValsFromStr(string vals) {
   vector<int> data;
@@ -39,10 +44,10 @@ void parseTrainData() {
     trainInput[i] = input;
     trainOutput[i] = output;
   }
-  #if DMODE
-    cerr<<"Loaded data inp size "<<trainInput.size()<<" out size "<<trainOutput.size()<<"\n";
-  #endif
-  cerr << "Training data loaded.\n";
+#if DRIVER_AVT
+  cerr << "Loaded data inp size " << trainInput.size() << " out size "
+       << trainOutput.size() << "\n";
+#endif
 }
 
 void randomShuffle(vector<int> &v) {
@@ -56,8 +61,10 @@ void trainingDriver(NeuralNet &model) {
   for (int i = 0; i < 42000; i++)
     trainAtRandomIdx[i] = i;
   for (int e = 0; e < epochs; e++) {
+#if DRIVER_AVT
     cerr << "Epoch : " << e << "\n";
-    //randomShuffle(trainAtRandomIdx);
+#endif
+    randomShuffle(trainAtRandomIdx);
     for (int i = 0; i < 42000; i += BATCH_SIZE) {
       vector<Matrix> inputs(BATCH_SIZE), outputs(BATCH_SIZE);
       for (int j = 0; j < BATCH_SIZE; j++) {
@@ -66,6 +73,7 @@ void trainingDriver(NeuralNet &model) {
       }
       model.train(inputs, outputs);
     }
+    reportTimeStamp();
   }
 }
 

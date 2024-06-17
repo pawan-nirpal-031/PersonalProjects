@@ -179,7 +179,8 @@ public:
   }
 
   Matrix multiplyMatrices(const Matrix &x, const Matrix &y) {
-    assert(x.getCols()==y.getRows() and "Invalid dimensions for matrix multiply");
+    assert(x.getCols() == y.getRows() and
+           "Invalid dimensions for matrix multiply");
     Matrix prod(x.getRows(), y.getCols());
     for (int i = 0; i < x.getRows(); i++) {
       for (int j = 0; j < y.getCols(); j++)
