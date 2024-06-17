@@ -57,6 +57,7 @@ void randomShuffle(vector<int> &v) {
 
 void trainingDriver(NeuralNet &model) {
   int epochs = 10;
+  float error;
   vector<int> trainAtRandomIdx(42000);
   for (int i = 0; i < 42000; i++)
     trainAtRandomIdx[i] = i;
@@ -73,7 +74,20 @@ void trainingDriver(NeuralNet &model) {
       }
       model.train(inputs, outputs);
     }
-    reportTimeStamp();
+
+    for (int i = 0; i < 42000; i++) {
+      Matrix CurrentOutput = model.feedForward(trainInput[i]);
+      for (int j = 0; j < 10; j++)
+        error += CoreMathUtils::square(CurrentOutput.getValAt(0, j) -
+                                       trainOutput[i].getValAt(0, j));
+    }
+
+    error /= 10.0;
+    error /= 42000.0;
+
+#if DRIVER_AVT
+    cerr << "Error : " << error << " Epoch End\n";
+#endif
   }
 }
 

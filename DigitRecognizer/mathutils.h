@@ -27,10 +27,12 @@ public:
 
   double randZeroOne() { return (nextInt() % 1000000001) / 1000000001.00; }
 
-  double sigmoid(double x) { return (1.0 / (1 + exp(-x))); }
+  static double sigmoid(double x) { return (1.0 / (1 + exp(-x))); }
 
   // x is the sigmoid value.
-  double sigmoidDerivative(double x) { return x * (1 - x); }
+  static double sigmoidDerivative(double x) { return x * (1 - x); }
+
+  static double square(double x) { return x * x; }
 };
 
 class Matrix {
@@ -196,7 +198,7 @@ public:
     Matrix sig(a.getRows(), a.getCols());
     for (int i = 0; i < a.getRows(); i++)
       for (int j = 0; j < a.getCols(); j++)
-        sig.setValAt(i, j, CoreMathUtils().sigmoid(a.getValAt(i, j)));
+        sig.setValAt(i, j, CoreMathUtils::sigmoid(a.getValAt(i, j)));
     return sig;
   }
 
@@ -204,8 +206,7 @@ public:
     Matrix sigD(a.getRows(), a.getCols());
     for (int i = 0; i < a.getRows(); i++)
       for (int j = 0; j < a.getCols(); j++)
-        sigD.setValAt(i, j,
-                      CoreMathUtils().sigmoidDerivative(a.getValAt(i, j)));
+        sigD.setValAt(i, j, CoreMathUtils::sigmoidDerivative(a.getValAt(i, j)));
     return sigD;
   }
 };
