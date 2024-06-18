@@ -9,7 +9,8 @@ class NeuralNet {
   vector<Matrix> weights, bais, deltaWeights, deltaBais;
   double learningRate;
 
-  Matrix computeActivationFunction(Matrix &weight, Matrix &bais, Matrix input) {
+  Matrix computeActivationFunction(Matrix &weight, Matrix &bais,
+                                   Matrix &input) {
     MatrixOpreations matOps;
     Matrix product = matOps.multiplyMatrices(input, weight);
     Matrix baisSum = matOps.addMatrices(product, bais);
