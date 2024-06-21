@@ -1,19 +1,18 @@
+
+# Consider dependencies only in project.
+set(CMAKE_DEPENDS_IN_PROJECT_ONLY OFF)
+
 # The set of languages for which implicit dependencies are needed:
 set(CMAKE_DEPENDS_LANGUAGES
-  "CXX"
   )
-# The set of files for implicit dependencies of each language:
-set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/pnirpal/Workspace/Learning/Courses/NeuralNetworks/src/Layer.cpp" "/home/pnirpal/Workspace/Learning/Courses/NeuralNetworks/CMakeFiles/OpenANN.dir/src/Layer.cpp.o"
-  "/home/pnirpal/Workspace/Learning/Courses/NeuralNetworks/src/Matrix.cpp" "/home/pnirpal/Workspace/Learning/Courses/NeuralNetworks/CMakeFiles/OpenANN.dir/src/Matrix.cpp.o"
-  "/home/pnirpal/Workspace/Learning/Courses/NeuralNetworks/src/NeuralNetwork.cpp" "/home/pnirpal/Workspace/Learning/Courses/NeuralNetworks/CMakeFiles/OpenANN.dir/src/NeuralNetwork.cpp.o"
-  "/home/pnirpal/Workspace/Learning/Courses/NeuralNetworks/src/Neuron.cpp" "/home/pnirpal/Workspace/Learning/Courses/NeuralNetworks/CMakeFiles/OpenANN.dir/src/Neuron.cpp.o"
-  "/home/pnirpal/Workspace/Learning/Courses/NeuralNetworks/src/main.cpp" "/home/pnirpal/Workspace/Learning/Courses/NeuralNetworks/CMakeFiles/OpenANN.dir/src/main.cpp.o"
-  )
-set(CMAKE_CXX_COMPILER_ID "GNU")
 
-# The include file search paths:
-set(CMAKE_CXX_TARGET_INCLUDE_PATH
+# The set of dependency files which are needed:
+set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/home/pawanani/personal-prjs/NeuralNetworks/src/Layer.cpp" "CMakeFiles/OpenANN.dir/src/Layer.cpp.o" "gcc" "CMakeFiles/OpenANN.dir/src/Layer.cpp.o.d"
+  "/home/pawanani/personal-prjs/NeuralNetworks/src/Matrix.cpp" "CMakeFiles/OpenANN.dir/src/Matrix.cpp.o" "gcc" "CMakeFiles/OpenANN.dir/src/Matrix.cpp.o.d"
+  "/home/pawanani/personal-prjs/NeuralNetworks/src/NeuralNetwork.cpp" "CMakeFiles/OpenANN.dir/src/NeuralNetwork.cpp.o" "gcc" "CMakeFiles/OpenANN.dir/src/NeuralNetwork.cpp.o.d"
+  "/home/pawanani/personal-prjs/NeuralNetworks/src/Neuron.cpp" "CMakeFiles/OpenANN.dir/src/Neuron.cpp.o" "gcc" "CMakeFiles/OpenANN.dir/src/Neuron.cpp.o.d"
+  "/home/pawanani/personal-prjs/NeuralNetworks/src/main.cpp" "CMakeFiles/OpenANN.dir/src/main.cpp.o" "gcc" "CMakeFiles/OpenANN.dir/src/main.cpp.o.d"
   )
 
 # Targets to which this target links.

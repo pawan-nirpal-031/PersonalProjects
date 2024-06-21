@@ -40,6 +40,7 @@ public:
     void setCurrentTarget(vector<double>&target);
     void printErrors();
     void printTargetToConsole() const;
+    void train(vector<Matrix*> inputs,vector<Matrix*> outputs);
 };
 
 #endif
