@@ -1,5 +1,3 @@
 #include "GenerateControlFlowGraph.h"
 
-int main(){
-    
-}
+int main() {}
