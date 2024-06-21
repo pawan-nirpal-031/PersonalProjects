@@ -5,6 +5,7 @@ class Node {
   vector<vector<string>> block;
   vector<int> decendants;
   vector<int> predecessors;
+  unsigned numInsts;
 
 public:
   void FillNode(int id, int st, int end, const vector<vector<string>> &tree) {
@@ -13,12 +14,23 @@ public:
     for (int i = st; i <= end; i++) {
       this->block.push_back(tree[i]);
     }
+    numInsts = block.size();
   }
+
+  unsigned getNumInstructions() { return numInsts; }
 
   void InsertDecendent(int dec_node) { this->decendants.push_back(dec_node); }
 
+  void InsertPredecessor(int preNode) { predecessors.push_back(preNode); }
+
   void ShowDecendends() {
     for (const int &node : this->decendants) {
+      cout << node << ' ';
+    }
+  }
+
+  void ShowPredecessors() {
+    for (const int &node : this->predecessors) {
       cout << node << ' ';
     }
   }
@@ -38,16 +50,18 @@ public:
 
   vector<string> GetEndStatement() { return block.back(); }
 
-  vector<vector<string>> &BlockAccess() { return this->block; }
+  vector<vector<string>> &getBlock() { return this->block; }
 };
 
 class ControlFlowGraph {
   vector<Node> graph;
+  unsigned nodeCount;
 
   void GenerateControlFlowGraph(const vector<pair<int, int>> &basic_blocks,
                                 const vector<vector<string>> &tree,
                                 const unordered_set<string> &jmp_labels) {
     unordered_map<string, int> label_to_node;
+    nodeCount = basic_blocks.size();
     for (int node = 0; node < basic_blocks.size(); node++) {
       int st = basic_blocks[node].first;
       int end = basic_blocks[node].second;
@@ -70,6 +84,10 @@ class ControlFlowGraph {
       if (node != graph.size() - 1)
         graph[node].InsertDecendent(node + 1);
     }
+    ComputePredecessors();
+    ViewAdjecentcyList();
+    cout << "Showing Pre list\n\n";
+    ViewPredecessorList();
   }
 
   void DepthFirstTraverseCFG(int node, vector<bool> &vis) {
@@ -80,6 +98,24 @@ class ControlFlowGraph {
     for (int dec : decendends)
       if (not vis[dec])
         DepthFirstTraverseCFG(dec, vis);
+  }
+
+  void performPredecessorComputation(int node, vector<bool> &vis) {
+    if (vis[node])
+      return;
+    vis[node] = true;
+    vector<int> &decendends = graph[node].GetDecendends();
+    for (int &dec : decendends) {
+      graph[dec].InsertPredecessor(node);
+      if (not vis[dec])
+        performPredecessorComputation(dec, vis);
+    }
+  }
+
+  void ComputePredecessors() {
+    vector<bool> vis(graph.size(), 0);
+    for (int i = 0; i < nodeCount; i++)
+      performPredecessorComputation(i, vis);
   }
 
 public:
@@ -102,8 +138,17 @@ public:
     }
   }
 
+  void ViewPredecessorList() {
+    for (int i = 0; i < graph.size(); i++) {
+      cout << i << " : ";
+      graph[i].ShowPredecessors();
+      cout << '\n';
+    }
+  }
+
   void DepthTraverseCFG() {
     vector<bool> vis(graph.size(), 0);
-    DepthFirstTraverseCFG(0, vis);
+    for (int i = 0; i < nodeCount; i++)
+      DepthFirstTraverseCFG(i, vis);
   }
 };

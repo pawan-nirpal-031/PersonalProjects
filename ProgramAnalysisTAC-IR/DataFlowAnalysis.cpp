@@ -371,13 +371,79 @@ class FlowGraphLevelAnalysis {};
 
 class DataFlowAnalysis {};
 
+class LivenessInfoBB {
+public:
+  vector<string> liveIn, liveOut;
+  // there are numInsts - 1 num of program points in a BB.
+  vector<vector<string>> liveAtProgPoint;
+  unsigned numAnalysisPoints;
+  Node *CurrBB;
+  bool isValid;
+};
+
+class LivenessAnalysis {
+  vector<LivenessInfoBB> livenessAnalysisForCFG;
+  // Node is also an index in livenessAnalysisForCFG which is already
+  // initalized, for a corrospoinding BB in Graph.
+  void traverseBackwardsForLiveness(unsigned node,
+                                    vector<bool> &livenessComputed,
+                                    vector<Node> &Graph) {
+    if (livenessComputed[node])
+      return;
+    // compute sucessor liveness first. From successor liveness compute own
+    // liveness.
+    auto successors = Graph[node].GetDecendends();
+    for (auto succ : successors) {
+      if (not livenessComputed[succ])
+        traverseBackwardsForLiveness(succ, livenessComputed, Graph);
+    }
+    livenessComputed[node] = true;
+    LivenessInfoBB &LBB = livenessAnalysisForCFG[node];
+    auto BB = LBB.CurrBB->getBlock();
+    unsigned numInsts = LBB.CurrBB->getNumInstructions();
+    if (successors.size() == 0) {
+      // means no outgoing edges in cfg, no succs. Nothing is live out.
+      LBB.isValid = true;
+      // no vars are live out. Hence empty.
+      LBB.liveOut.clear();
+      // compute LiveIn[i] = (LiveOut[i] - Def[i]) U (Uses[i])
+      for (int i = numInsts - 1; i >= 0; i--) {
+        vector<string> liveInAtPoint;
+        if (BB[i].size() >= 2) {
+          if (BB[i][1] == "=") {
+          }
+        }
+      }
+    }
+  }
+
+  void computeLivenessBackwards(vector<Node> &Graph) {
+    unsigned start = 0;
+    vector<bool> livenessComputed(Graph.size(), false);
+    traverseBackwardsForLiveness(start, livenessComputed, Graph);
+  }
+
+public:
+  LivenessAnalysis(vector<Node> &Graph) {
+    for (int node = 0; node < Graph.size(); node++) {
+      LivenessInfoBB LBB;
+      LBB.CurrBB = &Graph[node];
+      LBB.numAnalysisPoints = LBB.CurrBB->getNumInstructions() + 1;
+      LBB.liveAtProgPoint.resize(LBB.numAnalysisPoints);
+      LBB.isValid = false;
+      livenessAnalysisForCFG.push_back(LBB);
+    }
+    computeLivenessBackwards(Graph);
+  }
+};
+
 int main() {
   const string irfile = "IR.txt";
   ControlFlowGraph graph_obj(irfile);
   vector<Node> &graph = graph_obj.GetFlowGraph();
   int node = 0;
-  BlockLevelAnalysis analyser;
-  analyser.RunPassOnBlock(graph[node].BlockAccess(), 1);
+  // BlockLevelAnalysis analyser;
+  // analyser.RunPassOnBlock(graph[node].getBlock(), 1);
   // graph[node].ShowNodeBlockContents();
   return 0;
 }
