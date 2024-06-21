@@ -1,0 +1,28 @@
+arithmatic/logical/bitwise ops 
+   # x = y op z  (5)
+   
+
+memory access 
+    x = * z (4)
+
+
+system io 
+   # print x (2)
+   
+   # scan x (2)
+
+
+assignment 
+   x = y    (3)
+
+
+control flow 
+   # if x op y goto L (6)
+   
+   # if x goto L    (4)
+
+   # goto L     (2)
+
+   # return x   (2)
+
+   # exit (1)

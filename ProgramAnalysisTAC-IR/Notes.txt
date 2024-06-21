@@ -1,0 +1,12 @@
+
+
+    Narrow issue Inorder 
+    Narrow issue Out of Order 
+    Wide issue Inorder 
+    Wide issue out of Order ( best choice for HPC applications ) 
+
+    Eliminate Anti and Name ( False dependencies ) 
+    Instruction reordering  
+    Instruction scheduling for improving IPC  
+    Register renaming can rule out False dependencies 
+    out of Order execution can improve true dependencies

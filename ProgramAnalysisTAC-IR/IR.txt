@@ -1,0 +1,43 @@
+r1 = 0 * 9
+r2 = 1 + 7 
+r3 = r2 - 4 
+r4 = r1 - 4 
+r5 = 4 * r2 
+print r5 
+r6 = 16 * r4
+r7 = r6 / 32
+r8 = r2 - 4
+r9 = r6 / 32 
+r10 = 16 * r7 
+print r10 
+r11 = r1 - 0
+r12 = 1 || r6
+r13 = r6 && 0
+r14 = r11 ^ r11
+r15 = 0 ^ r6
+
+L0: print r5
+    scan r5
+    r16 = * r5
+
+L1: r17 = * r1
+    r18 = r15 * r17 
+    r19 = r1 + r18 
+    r20 = r2 + 1
+    if r19 <= 20 goto L3
+
+L2: r21 = r1 + 10 
+    r22 = r21 + 1
+    if r22 == 10  goto L1
+
+L3: r23 = r21 * 5 
+    r24 = * r22
+    if r23 < r24  goto L2
+
+    r25 = r1 + r2
+    if r25 != 0  goto L0
+
+    r26 = r25 + 7 
+    print r26
+    return r26 
+

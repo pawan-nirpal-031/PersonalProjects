@@ -1,0 +1,4 @@
+#FIX : constant prop does not consider phi nodes add phi nodes
+
+
+#done : inst depdency grph, the list shoule be a set (unique), debug inst_dependency_graph impl 
