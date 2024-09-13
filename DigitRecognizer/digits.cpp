@@ -94,7 +94,7 @@ void trainingDriver(NeuralNet &model) {
 int main() {
   parseTrainData();
   vector<unsigned> topology = {784, 20, 10};
-  double learnRate = 1.0;
+  double learnRate = 0.001;
   NeuralNet digitRecg(topology, learnRate);
   trainingDriver(digitRecg);
 }
