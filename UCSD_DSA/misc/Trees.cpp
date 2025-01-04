@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <queue>
 #include <assert.h>
 using namespace std;
 
@@ -156,31 +157,20 @@ class Tree{
        buildParentMap(curr->getRightNode(),curr,parMap);
     }
 
-    // Buggy
-    Node* lowestCommonAncestor(Node *root,Node *a, Node *b){
-        int depthA = 0;
-        getDepthOfNodeInBST(root,a->getVal(),depthA);
-        int depthB = 0;
-        getDepthOfNodeInBST(root,b->getVal(),depthB);
-        map<Node*,Node*> parMap;
-        buildParentMap(root,nullptr,parMap);
-        if(depthA < depthB){
-            while(depthB!=depthA){
-                b = parMap[b];
-                depthB-=1;
-            }
-        }else if(depthA > depthB){
-            while(depthA!=depthB){
-                a = parMap[a];
-                depthA-=1;
-            }
-        }
-        assert(depthA==depthB && "Unequal depths still");
-        while(a!=b){
-            a = parMap[a];
-            b = parMap[b];
-        }
-        return a;
+    // enforcing  invarient a < b. If not true just swap.
+    Node* lowestCommonAncestorOfBST(Node *root,Node *a, Node *b){
+        if(root==nullptr)
+            return nullptr;
+        int rootv = root->getVal();
+        int av = a->getVal();
+        int bv = b->getVal();
+        if((rootv > av and rootv < bv) or (av==rootv or bv==rootv))
+            return root;
+        else if((av < rootv and bv < rootv))
+            return lowestCommonAncestorOfBST(root->getLeftNode(),a,b);
+        else if((av > rootv and bv > rootv))
+            return lowestCommonAncestorOfBST(root->getRightNode(),a,b);
+        return nullptr;
     }
 
 public:
@@ -217,11 +207,11 @@ public:
         return false;
     }
 
-    int lca(int x, int y){
-        Node *Nx = getNode(root,x);
-        Node *Ny = getNode(root,y);
-        Node *lcaN = lowestCommonAncestor(root,Nx,Ny);
-        return lcaN->getVal();
+    int lcaOfBST(Node *root,Node *a, Node *b){
+        // enforcing  invarient a < b. If not true just swap.
+        if(a->getVal() > b->getVal())
+            swap(a,b);
+        return lowestCommonAncestorOfBST(root,a,b);
     }
 
     int getNodeDepth(int x){
