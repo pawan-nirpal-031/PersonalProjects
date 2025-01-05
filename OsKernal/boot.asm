@@ -1,8 +1,23 @@
-ORG 0x7c00
-BITS 16
+ORG 0 ; Set the origin/PC to 0
+BITS 16 ; All real mode code is 16 bits
+
+jmp 0x7c0:start ; Jump to the start label/ Change of Code segment. 
 
 ; all this does it ouput the letter 'A' to the screen
 start:
+    cli ; clear interupt flags/Disable interupts, because we want to change some segment registers and we don't want to be interrupted while doing this operation.
+
+    ; Explicit setting of the segment registers. 
+    mov ax, 0x07C0 ; Set the data segment register to 0x07C0 which is the segment where the bootloader is loaded. 
+    mov ds, ax ; Set the data segment register to 0x07C0
+    mov es, ax ; Set the extra segment register to 0x07C0
+
+    ; set the stack segment. 
+    mov ax, 0x00 ; Set the stack segment register to 0x0000
+    mov ss, ax ; Set the stack segment register to 0x0000
+    mov sp, 0x7C00 ; Set the stack pointer to 0x7C00
+
+    sti ; Set/Enable interupt flags
     mov si, message ; load the address of the message into si
     call print ; call the print function
     jmp $ ; infinite loop
@@ -20,7 +35,7 @@ print:
     ret
 
 printChar:
-    mov ah,0eh
+    mov ah,0eh ; output to terminal function
     int 0x10 ; interrupt to call bios
     ret 
 
