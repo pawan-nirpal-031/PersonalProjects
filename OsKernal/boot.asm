@@ -1,10 +1,17 @@
 ORG 0 ; Set the origin/PC to 0
 BITS 16 ; All real mode code is 16 bits
 
-jmp 0x7c0:start ; Jump to the start label/ Change of Code segment. 
+_start:
+    jmp short start 
+    nop
+
+times 33 db 0 ; 33 bytes of padding after shortjmp for bios parameter block for safety
 
 ; all this does it ouput the letter 'A' to the screen
 start:
+    jmp 0x7c0:step2 ; Jump to the start label/ Change of Code segment to 0x7c0. 
+
+step2:
     cli ; clear interupt flags/Disable interupts, because we want to change some segment registers and we don't want to be interrupted while doing this operation.
 
     ; Explicit setting of the segment registers. 
@@ -25,6 +32,7 @@ start:
 ; Rest of the sector is filled with 0s because we need to make sure that the byte 510 and 511 are 0xAA55 which is the boot signature
 
 print:
+    mov bx, 0 ; initalize the display terminal
 .loop:
     lodsb ; load the byte from si into al and increment si
     cmp al, 0
