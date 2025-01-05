@@ -11,6 +11,14 @@ times 33 db 0 ; 33 bytes of padding after shortjmp for bios parameter block for 
 start:
     jmp 0x7c0:step2 ; Jump to the start label/ Change of Code segment to 0x7c0. 
 
+; Writing our own interupt to handle div by zero. 
+handleZero:
+    mov ah, 0eh
+    mov al, 'A'
+    mov bx, 0x00
+    int 0x10
+    iret ; intr return
+
 step2:
     cli ; clear interupt flags/Disable interupts, because we want to change some segment registers and we don't want to be interrupted while doing this operation.
 
@@ -25,6 +33,14 @@ step2:
     mov sp, 0x7C00 ; Set the stack pointer to 0x7C00
 
     sti ; Set/Enable interupt flags
+
+    ; Change interupt vector table's first interupt handler to our custom interupt handler of div by zero. We do that by changing first 4 bytes of memory ( because IVT starts at the very first byte of memory, the first two bytes are offset and segment of the div by zero intr handler routine)
+    mov word[ss:0x00], handleZero ; word -> 2 bytes, ss -> relative to stack seg if you don't use it, the machine uses data seg by def because that's where PC is, handleZero is the address of our custom intr handler. 
+    mov word[ss:0x02], 0x7c0
+    
+    mov ax, 0x00
+    div ax ; dividng by zero that triggers handleZero custom intr we wrote. 
+
     mov si, message ; load the address of the message into si
     call print ; call the print function
     jmp $ ; infinite loop
