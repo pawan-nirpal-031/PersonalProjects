@@ -1,5 +1,8 @@
-ORG 0 ; Set the origin/PC to 0
+ORG 0x7c00 ; the origin/PC to start the code from.
 BITS 16 ; All real mode code is 16 bits
+
+CODE_SEG equ gdtCode - gdtStart
+DATA_SEG equ gdtData - gdtStart
 
 _start:
     jmp short start 
@@ -9,7 +12,7 @@ times 33 db 0 ; 33 bytes of padding after shortjmp for bios parameter block for 
 
 ; all this does it ouput the letter 'A' to the screen
 start:
-    jmp 0x7c0:step2 ; Jump to the start label/ Change of Code segment to 0x7c0. 
+    jmp 0:step2 ; Jump to the start label/ Change of Code segment to 0x7c0. 
 
 ; Writing our own interupt to handle div by zero. 
 handleZero:
@@ -23,7 +26,7 @@ step2:
     cli ; clear interupt flags/Disable interupts, because we want to change some segment registers and we don't want to be interrupted while doing this operation.
 
     ; Explicit setting of the segment registers. 
-    mov ax, 0x07C0 ; Set the data segment register to 0x07C0 which is the segment where the bootloader is loaded. 
+    mov ax, 0 ; Set the data segment register to 0x0000
     mov ds, ax ; Set the data segment register to 0x07C0
     mov es, ax ; Set the extra segment register to 0x07C0
 
@@ -34,37 +37,58 @@ step2:
 
     sti ; Set/Enable interupt flags
 
-    ; Change interupt vector table's first interupt handler to our custom interupt handler of div by zero. We do that by changing first 4 bytes of memory ( because IVT starts at the very first byte of memory, the first two bytes are offset and segment of the div by zero intr handler routine)
-    mov word[ss:0x00], handleZero ; word -> 2 bytes, ss -> relative to stack seg if you don't use it, the machine uses data seg by def because that's where PC is, handleZero is the address of our custom intr handler. 
-    mov word[ss:0x02], 0x7c0
-    
-    mov ax, 0x00
-    div ax ; dividng by zero that triggers handleZero custom intr we wrote. 
+.loadProtected:
+    cli ; clear interupt flags/Disable interupts, because we want to change some segment registers and we don't want to be interrupted while doing this operation.
+    lgdt[gdtDiscriptor] ; Load the GDT table
+    mov eax, cr0 ; Move the value of cr0 to eax
+    or eax, 0x1 
+    mov cr0, eax ; Set the first bit of cr0 to 1 to enable protected mode
+    jmp CODE_SEG:load32
 
-    mov si, message ; load the address of the message into si
-    call print ; call the print function
-    jmp $ ; infinite loop
+
+; GDT for jumping to protected mode. 
+gdtStart:
+gdtNull:
+    dd 0x0
+    dd 0x0 
+
+; offset 0x8 
+gdtCode:       ; CS should point to this. 
+    dw 0xffff ; segment limit first 0-15 bits
+    dw 0x0 ; base address first 0-15 bits
+    db 0x0 ; base address 16-23 bits
+    db 0x9a ; access byte
+    db 11001111b ; high and low flags. 
+    db 0 ; base address 24-31 bits
+
+; offset 0x10
+gdtData:       ; DS, ES, SS should point to this. 
+    dw 0xffff ; segment limit first 0-15 bits
+    dw 0x0 ; base address first 0-15 bits
+    db 0x0 ; base address 16-23 bits
+    db 0x92 ; access byte
+    db 11001111b ; high and low flags. 
+    db 0 ; base address 24-31 bits
+
+gdtEnd:
+
+gdtDiscriptor:
+    dw gdtEnd - gdtStart - 1 ; size of the GDT
+    dd gdtStart ; address of the GDT
+
+[BITS 32]
+load32:
+    mov ax, DATA_SEG
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+    mov ss, ax
+    mov ebp, 0x00200000
+    mov esp, ebp
+    jmp $
 
 ; Rest of the sector is filled with 0s because we need to make sure that the byte 510 and 511 are 0xAA55 which is the boot signature
-
-print:
-    mov bx, 0 ; initalize the display terminal
-.loop:
-    lodsb ; load the byte from si into al and increment si
-    cmp al, 0
-    je .done ; if al is 0 then we are done
-    call printChar ; call the printChar function
-    jmp .loop ; jump back to the loop
-.done: ; Sublabel of print
-    ret
-
-printChar:
-    mov ah,0eh ; output to terminal function
-    int 0x10 ; interrupt to call bios
-    ret 
-
-
-message: db "Hello, World!", 0   ; a label that defines a string Hello world
 
 times 510 - ($ - $$) db 0  ; fill the rest of the sector with 0s basically padding the 510 bytes with start code and rest is all 0s
 dw 0xAA55 ; boot signature 2 bytes that completes 512 bytes of sector on disk. Putting this boot signature tells the bios that this is a bootable disk
