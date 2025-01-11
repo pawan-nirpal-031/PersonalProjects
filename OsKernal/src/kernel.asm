@@ -1,5 +1,6 @@
 [BITS 32]
 global _start
+extern kernelMain
 
 CODE_SEG equ 0x08 
 DATA_SEG equ 0x10
@@ -19,6 +20,7 @@ _start:
     or al, 2
     out 0x92, al
 
+    call kernelMain
     jmp $
 
 times 512- ($ - $$) db 0  ; fill the rest of the sector with 0s basically padding the 510 bytes with start code and rest is all 0s
