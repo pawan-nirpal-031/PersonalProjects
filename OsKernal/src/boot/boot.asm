@@ -78,15 +78,65 @@ gdtDiscriptor:
 
 [BITS 32]
 load32:
-    mov ax, DATA_SEG
-    mov ds, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
-    mov ss, ax
-    mov ebp, 0x00200000
-    mov esp, ebp
-    jmp $
+    mov eax, 1
+    mov ecx,100 
+    mov edi, 0x100000
+    call ataLbaRead
+    jmp CODE_SEG:0x0100000
+
+
+ataLbaRead:
+    mov ebx,eax ; LBA backup. 
+    ; send highest 8 bits of lba to the disk controller. 
+    shr eax,24
+    or eax,0xE0 ; Selcting the master drive
+    mov dx, 0x1F6 ; Port number for sending the highest 8 bits of LBA
+    out dx, al ; send the highest 8 bits of LBA to the disk controller.
+    ; Done sending the highest 8 bits of LBA to the disk controller.
+
+    ; Send the total sectors to read.
+    mov eax, ecx 
+    mov dx, 0x1F2 ; Port number for sending the number of sectors to read/write
+    out dx, al ; send the number of sectors to read/write to the disk controller.
+
+    mov eax,ebx ; LBA restore.
+    mov dx, 0x1F3 ; Port number for sending the LBA to the disk controller
+    out dx, al ; send the LBA to the disk controller.
+
+    ; Send some more bits of LBA to the disk controller.
+    mov dx, 0x1F4 ; Port number for sending the LBA to the disk controller
+    mov eax, ebx ; LBA restore.
+    shr eax,8
+    out dx, al ; send the LBA to the disk controller.
+
+    ; Send upper 16 bits of LBA to the disk controller.
+    mov dx, 0x1F5 ; Port number for sending the LBA to the disk controller
+    mov eax, ebx ; LBA restore.
+    shr eax,16  
+    out dx, al ; send the LBA to the disk controller.
+    ; Finished sending the LBA to the disk controller.
+
+    mov dx, 0x1F7 ; Port number for sending the command to the disk controller
+    mov al, 0x20 ; Read command
+    out dx, al ; send the read command to the disk controller.
+
+.nextSector:
+    push ecx ; backup the ecx register
+
+; checking if we need read. 
+.tryAgain:
+    mov dx, 0x1F7 ; Port number for sending the command to the disk controller
+    in al, dx ; read the status of the disk controller
+    test al, 0x80 ; check if the disk is busy
+    jnz .tryAgain ; if the disk is busy then try again
+
+    mov ecx, 256 ; number of bytes to read
+    mov dx, 0x1F0 ; Port number for reading the data from the disk controller
+    rep insw ; read the data from the port 0x1F0 to the memory location pointed by edi which is 1M, rep means do this ecx times which is 256 times
+    pop ecx ; restore the ecx register
+    loop .nextSector ; loop through the sectors to read
+    ret 
+
 
 ; Rest of the sector is filled with 0s because we need to make sure that the byte 510 and 511 are 0xAA55 which is the boot signature
 
