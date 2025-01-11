@@ -6,26 +6,24 @@ uint16_t *videoMem = 0;
 uint16_t TermRow = 0;
 uint16_t TermCol = 0;
 
-uint16_t terminalMakeChar(char c, char col) {
-  return  col << 8 | c;
-}
+uint16_t terminalMakeChar(char c, char col) { return col << 8 | c; }
 
 void terminalPutChar(char c, char col, int x, int y) {
   videoMem[(y * VGA_WIDTH) + x] = terminalMakeChar(c, col);
 }
 
-void terminalWriteChar(char c,char col){
-    if(c=='\n'){
-        TermCol = 0;
-        TermRow+=1;
-        return;
-    }
-    terminalPutChar(c,col,TermCol,TermRow);
-    TermCol+=1;
-    if(TermCol >= VGA_WIDTH){
-        TermCol = 0;
-        TermRow+=1;
-    }
+void terminalWriteChar(char c, char col) {
+  if (c == '\n') {
+    TermCol = 0;
+    TermRow += 1;
+    return;
+  }
+  terminalPutChar(c, col, TermCol, TermRow);
+  TermCol += 1;
+  if (TermCol >= VGA_WIDTH) {
+    TermCol = 0;
+    TermRow += 1;
+  }
 }
 
 // Initialize the terminal with blank spaces
@@ -51,7 +49,7 @@ void print(const char *str) {
     terminalWriteChar(str[i], 15);
 }
 
-void kernelMain() { 
-    terminalInitalize(); 
-    print("Hello, World!\nTest");
+void kernelMain() {
+  terminalInitalize();
+  print("Hello, World!\nTest");
 }
