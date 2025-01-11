@@ -20,3 +20,5 @@ _start:
     out 0x92, al
 
     jmp $
+
+times 512- ($ - $$) db 0  ; fill the rest of the sector with 0s basically padding the 510 bytes with start code and rest is all 0s
