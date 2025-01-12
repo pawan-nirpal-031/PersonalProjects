@@ -1,5 +1,6 @@
 #include "kernel.h"
 #include "idt/idt.h"
+#include "io/io.h"
 #include <stddef.h> // size_t
 #include <stdint.h>
 
@@ -55,4 +56,6 @@ void kernelMain() {
   print("Hello, World!\nTest");
 
   idtInit(); // Initialize the IDT
+
+  outb(0x60, 0xff);
 }

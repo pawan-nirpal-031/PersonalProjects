@@ -1,4 +1,4 @@
-FILES = ./build/kernel.asm.o ./build/kernel.o ./build/idt/idt.asm.o ./build/memory/memory.o ./build/idt/idt.o
+FILES = ./build/kernel.asm.o ./build/kernel.o ./build/idt/idt.asm.o ./build/memory/memory.o ./build/idt/idt.o ./build/io/io.asm.o
 
 INCLUDES = -I./src
 
@@ -31,6 +31,9 @@ all: ./bin/boot.bin ./bin/kernel.bin
 
 ./build/memory/memory.o: ./src/memory/memory.c 
 	i686-elf-gcc -std=gnu99 $(INCLUDES) -I./src/memory $(FLAGS) -c ./src/memory/memory.c -o ./build/memory/memory.o
+
+./build/io/io.asm.o: ./src/io/io.asm
+	nasm -f elf -g ./src/io/io.asm -o ./build/io/io.asm.o
 
 
 clean:
