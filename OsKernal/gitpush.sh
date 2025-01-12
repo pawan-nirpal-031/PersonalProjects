@@ -2,6 +2,8 @@
 
 make clean
 clang-format -i src/*.c
+clang-format -i src/idt/*.c
+clang-format -i src/memory/*.c
 # Ask for commit message
 echo "Enter commit message: "
 read commit_message

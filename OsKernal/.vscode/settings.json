@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "*.ld": "cpp",
+        "idt.h": "c"
+    }
+}

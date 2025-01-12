@@ -1,4 +1,5 @@
 #include "kernel.h"
+#include "idt/idt.h"
 #include <stddef.h> // size_t
 #include <stdint.h>
 
@@ -52,4 +53,6 @@ void print(const char *str) {
 void kernelMain() {
   terminalInitalize();
   print("Hello, World!\nTest");
+
+  idtInit(); // Initialize the IDT
 }
