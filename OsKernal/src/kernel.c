@@ -56,6 +56,4 @@ void kernelMain() {
   print("Hello, World!\nTest");
 
   idtInit(); // Initialize the IDT
-
-  outb(0x60, 0xff);
 }
