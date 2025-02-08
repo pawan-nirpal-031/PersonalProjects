@@ -69,36 +69,16 @@ vector<vector<int>> getBoardCopy(vector<vector<int>> &Board){
     return backup;
 }
 
-vector<pair<int,int>> getInitalMostConstrainedIsland(vector<vector<int>> &Board){
-    vector<int> count(BSize+2,0); // 0 is empty cell, 1 is the Queen.
-    for(int i = 0;i<BSize;i++)
-        for(int j =0;j<BSize;j++)
-            count[Board[i][j]]+=1;
-    int island = -1;
-    int MinSz = 1000000;
-    for(int i = 2;i < BSize + 2;i++){
-        if(count[i] < MinSz){
-            island = i;
-            MinSz = count[i];
+vector<pair<int,int>> getNextMostConstrainedIsland(vector<vector<int>> &Board, bool isStart){
+    vector<int> count(BSize+2,0); // -1 is an invalid cell, 1 is the Queen skip both, 0 is not possible at this point.
+    for(int i = 0;i<BSize;i++){
+        for(int j =0;j<BSize;j++){
+            if(!isStart and Board[i][j] > 1)
+                count[Board[i][j]]+=1;
+            if(isStart)
+                count[Board[i][j]]+=1;
         }
     }
-    vector<pair<int,int>> Blob;
-    for(int i = 0;i<BSize;i++)
-        for(int j =0;j<BSize;j++)
-            if(Board[i][j]==island)
-                Blob.push_back({i,j});
-    for(int i = 0;i<BSize;i++)
-        for(int j =0;j<BSize;j++)
-            assert(Board[i][j]!=0 and "How did an empty cell remain?");
-    return Blob;
-}
-
-vector<pair<int,int>> getInPlayNextMostConstrainedIsland(vector<vector<int>> &Board){
-    vector<int> count(BSize+2,0); // -1 is an invalid cell, 1 is the Queen skip both, 0 is not possible at this point.
-    for(int i = 0;i<BSize;i++)
-        for(int j =0;j<BSize;j++)
-            if(Board[i][j] > 1)
-                count[Board[i][j]]+=1;
     int island = -1;
     int MinSz = 1000000;
     for(int i = 2;i < BSize + 2;i++){
@@ -181,7 +161,7 @@ bool tryToFillBoard(vector<vector<int>> &Board, int &countOfQueensPlaced, pair<i
     assert(Board[x][y]==QUEEN and "Queen was accidentally removed.");
 
     // Now get the next most constrained island, if there are more than one candidates get anyone island for now (Eventually we can choose an optimal candidate by doing some kind of lookhead search)
-    vector<pair<int,int>> nextIsland = getInPlayNextMostConstrainedIsland(Board);
+    vector<pair<int,int>> nextIsland = getNextMostConstrainedIsland(Board, false);
 
     // Now go over each of the next candidate tiles, and try to place them, if sucessful in placing a queen at a tile, try to fill rest of the board, if we cannot place any candidate tile, backtrack by removing the current queentile placement. 
     for(auto candTile : nextIsland){
@@ -219,7 +199,7 @@ int main(){
     vector<vector<int>> Board(BSize, vector<int>(BSize,0));
     setBoard(Board);
     // Place queens in decending order of most to least constrained islands. As we keep placing queens a lot of the tiles will be marked as not placeable due to interference of the queens placed, and the constraints get tighter on remaining queens, if no valid placement is found backtrack and try the next placement of prior queens.
-    vector<pair<int,int>> InitalIsland = getInitalMostConstrainedIsland(Board);
+    vector<pair<int,int>> InitalIsland = getNextMostConstrainedIsland(Board, true);
     Fill(Board,InitalIsland);
     return 0;
 }
