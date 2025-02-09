@@ -1,5 +1,6 @@
 #include <cassert>
 #include <iostream>
+#include <set>
 #include <vector>
 using namespace std;
 
@@ -18,6 +19,7 @@ enum { QUEEN = 1 };
 // STATSICS
 bool EnableStats = true;
 unsigned long long int RecursiveFillingInvokeCount = 0;
+#define LOGGING false
 
 class Queens {
   unsigned int BSize;
@@ -174,6 +176,121 @@ public:
         InitalBoard[i][j] = Board[i][j];
   }
 
+  vector<pair<int, int>> getTilesOfIsland(int Island) {
+    vector<pair<int, int>> Tiles;
+    for (int i = 0; i < BSize; i++)
+      for (int j = 0; j < BSize; j++)
+        if (Board[i][j] == Island)
+          Tiles.push_back({i, j});
+    return Tiles;
+  }
+
+  int checkNumberOfIslandsRuledOutAfterPlacing(pair<int, int> tile) {
+    set<int> VisitedLands;
+    int x = tile.first;
+    int y = tile.second;
+
+    for (int i = -1; i <= 1; i++) {
+      for (int j = -1; j <= 1; j++) {
+        if (i == 0 and j == 0)
+          continue;
+        if (!isValidTile(x + i, y + j))
+          continue;
+        int cx = i + x;
+        int cy = i + y;
+        if (Board[cy][cy] == -1)
+          continue;
+        if (VisitedLands.find(Board[cx][cy]) != VisitedLands.end())
+          continue;
+        VisitedLands.insert(Board[cx][cy]);
+      }
+    }
+
+    for (int j = 0; j < BSize; j++) {
+      if (Board[x][j] == -1)
+        continue;
+      if (VisitedLands.find(Board[x][j]) == VisitedLands.end())
+        VisitedLands.insert(Board[x][j]);
+    }
+
+    for (int i = 0; i < BSize; i++) {
+      if (Board[i][y] == -1)
+        continue;
+      if (VisitedLands.find(Board[i][y]) == VisitedLands.end())
+        VisitedLands.insert(Board[i][y]);
+    }
+
+    return VisitedLands.size();
+  }
+
+  // If there are multiple Island that are candidates for the next
+  // most constrained Island, then check if any of them are already filled
+  // with a queen if yes then then such an Island cannot be a candidate for
+  // the next most constrained Island. And if there still are multiple
+  // candidates then choose the most constrained candiate based on the
+  // constraints criteria. The constraint criteria used next would be to
+  // check the number of Interferening Islands to the current Island, and
+  // choose the Island with the most interfering Islands, The reason is when
+  // we place Queen on this Island it will tigthen the constraints for more
+  // number of Islands and thus reducing the number of trails required to
+  // reach the solution.
+  int chooseOptimalCandidateIsland(vector<int> &candiateIslands) {
+    // TODO : Choose the most constrained Island based on the number of
+    // interfering Islands.
+
+    // For experimentation and performance evaluation, we can choose a random
+    // candidate for Baseling.
+    bool chooseRandom = false;
+    if (chooseRandom)
+      return candiateIslands[rand() % candiateIslands.size()];
+
+    // There are two ways to do this, either construct the interference graph or
+    // use a simple walk through the board, and check how many Islands will be
+    // ruled out as a result of placing a Queen on this Island.
+    // Well we can optimize this even more by considering even fine grained
+    // analysis of each of the tiles on any Island and then make a global
+    // decision based on tile level analysis.
+
+    int island = candiateIslands[0];
+    int maxRuledOutCount = 0;
+    for (int &candiate : candiateIslands) {
+      // Check if there is already a queen on this Island, if yes then this
+      // Island cannot be a candidate for the next most constrained Island.
+      bool isQueenPlaced = false;
+      for (int i = 0; i < BSize; i++) {
+        for (int j = 0; j < BSize; j++) {
+          if (InitalBoard[i][j] == candiate and Board[i][j] == QUEEN)
+            isQueenPlaced = true;
+        }
+      }
+      if (isQueenPlaced)
+        continue;
+
+      // Now let's check how many Islands will be ruled out as a result of
+      // placing a queen on for now any random tile of this Island. Later we can
+      // refine the analysis to choosing the best tile on this Island based on
+      // some strategy.
+      vector<pair<int, int>> tilesOfCandiateIsland = getTilesOfIsland(candiate);
+      for (auto tile : tilesOfCandiateIsland) {
+        // Check how many Islands will be ruled out as a result of placing this
+        // tile.
+        int ruledOutCount = checkNumberOfIslandsRuledOutAfterPlacing(tile);
+#if LOGGING
+        cout << "Ruled out count seen : " << ruledOutCount << "\n";
+#endif
+        if (ruledOutCount > maxRuledOutCount) {
+          maxRuledOutCount = ruledOutCount;
+          island = candiate;
+        }
+      }
+    }
+#if LOGGING
+    cout << "Island chosen : " << island
+         << " Since ruled out count is :  " << maxRuledOutCount << "\n";
+#endif
+    return island;
+  }
+
   vector<pair<int, int>> getNextMostConstrainedIsland(bool isStart) {
     enum STRATEGY { RANDOM, MOST_CONSTRAINED, LEAST_CONSTRAINED };
     bool tuneStrategy = false;
@@ -202,6 +319,18 @@ public:
           count[Board[i][j]] += 1;
       }
     }
+    if (tuneStrategy) {
+      STRATEGY strategy = RANDOM;
+      if (strategy == RANDOM) {
+        int randomIsland = rand() % BSize + 2;
+        vector<pair<int, int>> Blob;
+        for (int i = 0; i < BSize; i++)
+          for (int j = 0; j < BSize; j++)
+            if (Board[i][j] == randomIsland)
+              Blob.push_back({i, j});
+        return Blob;
+      }
+    }
     int island = -1;
     int MinSz = 1000000;
     for (int i = 2; i < BSize + 2; i++) {
@@ -211,6 +340,10 @@ public:
       }
     }
 
+    // No canidate Island found, So this must not lead to a valid solution.
+    if (island == -1)
+      return {};
+
     vector<int> candiateIslands;
     for (int i = 2; i < BSize + 2; i++) {
       if (count[i] == MinSz)
@@ -219,24 +352,8 @@ public:
     if (candiateIslands.size() == 1)
       island = candiateIslands[0];
     else if (candiateIslands.size() > 1) {
-
-      // TODO : If there are multiple Island that are candidates for the next
-      // most constrained Island, then check if any of them are already filled
-      // with a queen if yes then then such an Island cannot be a candidate for
-      // the next most constrained Island. And if there still are multiple
-      // candidates then choose the most constrained candiate based on the
-      // constraints criteria. The constraint criteria used next would be to
-      // check the number of Interferening Islands to the current Island, and
-      // choose the Island with the most interfering Islands, The reason is when
-      // we place Queen on this Island it will tigthen the constraints for more
-      // number of Islands and thus reducing the number of trails required to
-      // reach the solution.
-      island = candiateIslands[0];
+      island = chooseOptimalCandidateIsland(candiateIslands);
     }
-
-    // No canidate Island found, So this must not lead to a valid solution.
-    if(island == -1)
-      return {};
 
     // Emsure no Queem is placed on this Island.
     for (int i = 0; i < BSize; i++)
@@ -396,8 +513,8 @@ public:
     // next placement of prior queens.
     vector<pair<int, int>> InitalIsland = getNextMostConstrainedIsland(true);
     Fill(InitalIsland);
-    if (EnableStats){
-      cout<<"\n\n STATISTICS : \n";
+    if (EnableStats) {
+      cout << "\n\n STATISTICS : \n";
       cout << "\nRecursiveFillingInvokeCount : " << RecursiveFillingInvokeCount
            << "\n";
     }
