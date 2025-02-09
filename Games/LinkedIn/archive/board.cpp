@@ -18,7 +18,7 @@ enum Colors {
 }; // 1 is the queen.
 enum { QUEEN = 1 };
 
-void printBoard(vector<vector<int>> &Board) {
+void printBoardVisual(vector<vector<int>> &Board) {
   for (int i = 0; i < BSize; i++) {
     for (int j = 0; j < BSize; j++)
       if (Board[i][j] == QUEEN)
@@ -26,6 +26,40 @@ void printBoard(vector<vector<int>> &Board) {
       else
         cout << ". ";
     cout << "\n";
+  }
+}
+
+void printBoardNumeric(vector<vector<int>> &Board) {
+  for (int i = 0; i < BSize; i++) {
+    for (int j = 0; j < BSize; j++)
+      cout << Board[i][j] << " ";
+    cout << "\n";
+  }
+}
+
+void verifyBoard(vector<vector<int>> &Board, vector<vector<int>> &InitalBoard) {
+  // Queen count.
+  int count = 0; 
+  for(int i =0;i<BSize;i++){
+    for(int j =0;j<BSize;j++){
+      if(Board[i][j] == QUEEN)
+        count++;
+    }
+  }
+  assert(count == BSize and "Incorrect number of Queens.");
+  
+  // Verify 1 Queen per island.
+  vector<int> QueenPerIsland(BSize+2,0);
+  for(int i =0;i<BSize;i++){
+    for(int j =0;j<BSize;j++){
+      if(Board[i][j] == QUEEN){
+        if(QueenPerIsland[InitalBoard[i][j]] == 1){
+          cout<< "Island : "<<InitalBoard[i][j] << " has a queen placed on an Island with existing Queen.\n";
+          assert(false);
+        }
+        QueenPerIsland[InitalBoard[i][j]] += 1;
+      }
+    }
   }
 }
 
@@ -38,7 +72,8 @@ bool isValidTile(pair<int, int> QueenTile) {
           QueenTile.second >= 0 and QueenTile.second < BSize);
 }
 
-void setBoard(vector<vector<int>> &Board) {
+
+void setBoard0(vector<vector<int>> &Board) {
   // ORANGE
   Board[0][1] = Board[0][2] = ORANGE;
   for (int i = 0; i < 6; i++)
@@ -70,9 +105,47 @@ void setBoard(vector<vector<int>> &Board) {
     for (int j = 5; j < BSize; j++)
       if (Board[i][j] == 0)
         Board[i][j] = YELLOW;
-  // printBoard(Board);
+        
+  //printBoardNumeric(Board);
 }
 
+/*
+void setBoard(vector<vector<int>> &Board) {
+  // Purple
+  for(int i =0;i<BSize;i++){
+    Board[i][0] = PURPLE;
+    if((i>=0 and i<3 ) or (i>=5 and i!=7))
+      Board[i][1] = PURPLE;
+  }
+  // Red 
+  for(int j = 1;j<BSize-1;j++){
+    Board[3][j] = RED;
+    Board[4][j] = RED;
+    if(j==2 or j==3 or j==5 or j==6)
+      Board[2][j] = RED;
+    if(j>=2 and j < BSize -2)
+      Board[5][j] = RED;
+  }
+  Board[6][3] = Board[6][4] = Board[6][5] = Board[7][4] = RED;
+  // Pink 
+  for(int i =0;i<6;i++)
+    Board[i][8] = PINK;
+  Board[0][5] = Board[0][6] = Board[0][7] = Board[0][8] = Board[5][7] = PINK;
+  Board[6][6] = Board[6][7] = Board[7][6] = Board[7][7] = PINK;
+  // Orange 
+  Board[0][2] = Board[0][3] = Board[1][2] = ORANGE;
+  // White 
+  Board[1][6] = Board[1][7] = Board[2][7] = WHITE;
+  // Blue 
+  Board[0][4] = Board[1][4] = Board[2][4] = Board[1][3] = Board[1][5] = BLUE;
+  // Black 
+  Board[8][6] = Board[8][7] = Board[8][8] = Board[7][8] = Board[6][8] = BLACK;
+  // Yellow 
+  Board[7][1] = Board[7][2] = Board[7][3] = Board[8][3] = Board[6][2] = YELLOW;
+  // Green 
+  Board[8][4] = Board[8][5] = Board[7][5] = GREEN;
+}
+*/
 vector<vector<int>> getBoardCopy(vector<vector<int>> &Board) {
   vector<vector<int>> backup(BSize, vector<int>(BSize, 0));
   for (int i = 0; i < BSize; i++)
@@ -115,6 +188,21 @@ bool canPlaceQueen(vector<vector<int>> &Board, pair<int, int> QueenTile) {
   int x = QueenTile.first;
   int y = QueenTile.second;
 
+  // Check if the tile is already occupied.
+  if(Board[x][y] == QUEEN)
+    return false;
+
+  // Check if there is already a queen on this Island. 
+  // int TileCol = Board[x][y];
+  // for(int i =0;i<BSize;i++){
+  //   for(int j =0;j<BSize;j++){
+  //     if(Board[i][j] == TileCol){
+  //       if()
+  //       return false;
+  //     }
+  //   }
+  // }
+  
   for (int i = -1; i <= 1; i++) {
     for (int j = -1; j <= 1; j++) {
       if (!isValidTile(x + i, y + j))
@@ -146,11 +234,12 @@ bool tryToFillBoard(vector<vector<int>> &Board, int &countOfQueensPlaced,
   // need to revert to the current state.
   vector<vector<int>> BackupBoard = getBoardCopy(Board);
 
+  int TileCol = Board[x][y];
   Board[x][y] = QUEEN;
   countOfQueensPlaced += 1;
 
   if (countOfQueensPlaced == BSize) {
-    printBoard(Board);
+    printBoardVisual(Board);
     return true;
   }
 
@@ -170,6 +259,15 @@ bool tryToFillBoard(vector<vector<int>> &Board, int &countOfQueensPlaced,
         continue;
       // Mark tiles invalid.
       Board[x + i][y + j] = -1;
+    }
+  }
+  // Also mark all the tiles of the Island as invalid, As only 1 Queen per Island is allowed.
+  for(int i =0;i<BSize;i++){
+    for(int j =0;j<BSize;j++){
+      if(Board[i][j] == -1)
+        continue;
+      if(Board[i][j]==TileCol)
+        Board[i][j] = -1;
     }
   }
   assert(Board[x][y] == QUEEN and "Queen was accidentally removed.");
@@ -206,20 +304,26 @@ bool tryToFillBoard(vector<vector<int>> &Board, int &countOfQueensPlaced,
 void Fill(vector<vector<int>> &Board, vector<pair<int, int>> &InitalIsland) {
   // Try every position in Initial Island whichever start post leads to a valid
   // fill, mark the fill and exit.
+  vector<vector<int>> BackupBoardForVerification = getBoardCopy(Board);
   for (auto cord : InitalIsland) {
     int x = cord.first;
     int y = cord.second;
     int InitCol = Board[x][y];
     int countOfQueensPlaced = 0;
-    if (tryToFillBoard(Board, countOfQueensPlaced, cord))
+    if (tryToFillBoard(Board, countOfQueensPlaced, cord)){
+      verifyBoard(Board, BackupBoardForVerification);
       return;
+    }
     // Else clear the board and retry on a diff start tile.
   }
 }
 
+// TODO : Generate the board randomly and try to solve it.
+// TODO : Genralize the Bsize well. 
+
 int main() {
   vector<vector<int>> Board(BSize, vector<int>(BSize, 0));
-  setBoard(Board);
+  setBoard0(Board);
   // Place queens in decending order of most to least constrained islands. As we
   // keep placing queens a lot of the tiles will be marked as not placeable due
   // to interference of the queens placed, and the constraints get tighter on
