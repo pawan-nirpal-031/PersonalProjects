@@ -15,6 +15,7 @@ enum Colors {
   PINK
 }; // 1 is the queen.
 enum { QUEEN = 1 };
+unsigned long long int RecursiveFillingInvokeCount = 0;
 
 class Queens {
   unsigned int BSize;
@@ -131,49 +132,66 @@ public:
   }
 
   void setBoard1() {
-  // Purple
-  for(int i =0;i<BSize;i++){
-    Board[i][0] = PURPLE;
-    if((i>=0 and i<3 ) or (i>=5 and i!=7))
-      Board[i][1] = PURPLE;
-  }
-  // Red 
-  for(int j = 1;j<BSize-1;j++){
-    Board[3][j] = RED;
-    Board[4][j] = RED;
-    if(j==2 or j==3 or j==5 or j==6)
-      Board[2][j] = RED;
-    if(j>=2 and j < BSize -2)
-      Board[5][j] = RED;
-  }
-  Board[6][3] = Board[6][4] = Board[6][5] = Board[7][4] = RED;
-  // Pink 
-  for(int i =0;i<6;i++)
-    Board[i][8] = PINK;
-  Board[0][5] = Board[0][6] = Board[0][7] = Board[0][8] = Board[5][7] = PINK;
-  Board[6][6] = Board[6][7] = Board[7][6] = Board[7][7] = PINK;
-  // Orange 
-  Board[0][2] = Board[0][3] = Board[1][2] = ORANGE;
-  // White 
-  Board[1][6] = Board[1][7] = Board[2][7] = WHITE;
-  // Blue 
-  Board[0][4] = Board[1][4] = Board[2][4] = Board[1][3] = Board[1][5] = BLUE;
-  // Black 
-  Board[8][6] = Board[8][7] = Board[8][8] = Board[7][8] = Board[6][8] = BLACK;
-  // Yellow 
-  Board[7][1] = Board[7][2] = Board[7][3] = Board[8][3] = Board[6][2] = YELLOW;
-  // Green 
-  Board[8][4] = Board[8][5] = Board[7][5] = GREEN;
+    // Purple
+    for (int i = 0; i < BSize; i++) {
+      Board[i][0] = PURPLE;
+      if ((i >= 0 and i < 3) or (i >= 5 and i != 7))
+        Board[i][1] = PURPLE;
+    }
+    // Red
+    for (int j = 1; j < BSize - 1; j++) {
+      Board[3][j] = RED;
+      Board[4][j] = RED;
+      if (j == 2 or j == 3 or j == 5 or j == 6)
+        Board[2][j] = RED;
+      if (j >= 2 and j < BSize - 2)
+        Board[5][j] = RED;
+    }
+    Board[6][3] = Board[6][4] = Board[6][5] = Board[7][4] = RED;
+    // Pink
+    for (int i = 0; i < 6; i++)
+      Board[i][8] = PINK;
+    Board[0][5] = Board[0][6] = Board[0][7] = Board[0][8] = Board[5][7] = PINK;
+    Board[6][6] = Board[6][7] = Board[7][6] = Board[7][7] = PINK;
+    // Orange
+    Board[0][2] = Board[0][3] = Board[1][2] = ORANGE;
+    // White
+    Board[1][6] = Board[1][7] = Board[2][7] = WHITE;
+    // Blue
+    Board[0][4] = Board[1][4] = Board[2][4] = Board[1][3] = Board[1][5] = BLUE;
+    // Black
+    Board[8][6] = Board[8][7] = Board[8][8] = Board[7][8] = Board[6][8] = BLACK;
+    // Yellow
+    Board[7][1] = Board[7][2] = Board[7][3] = Board[8][3] = Board[6][2] =
+        YELLOW;
+    // Green
+    Board[8][4] = Board[8][5] = Board[7][5] = GREEN;
 
-  for (int i = 0; i < BSize; i++)
+    for (int i = 0; i < BSize; i++)
       for (int j = 0; j < BSize; j++)
         InitalBoard[i][j] = Board[i][j];
-}
+  }
 
   vector<pair<int, int>> getNextMostConstrainedIsland(bool isStart) {
-    vector<int> count(BSize + 2,
-                      0); // -1 is an invalid cell, 1 is the Queen skip
-                          // both, 0 is not possible at this point.
+    enum STRATEGY { RANDOM, MOST_CONSTRAINED, LEAST_CONSTRAINED };
+    bool tuneStrategy = false;
+    if (tuneStrategy) {
+      // Check random strategy to start with.
+      STRATEGY strategy = RANDOM;
+      if (isStart) {
+        int randomIsland = rand() % BSize + 2;
+        vector<pair<int, int>> Blob;
+        for (int i = 0; i < BSize; i++)
+          for (int j = 0; j < BSize; j++)
+            if (Board[i][j] == randomIsland)
+              Blob.push_back({i, j});
+        return Blob;
+      }
+    }
+
+    // -1 is an invalid cell, 1 is the Queen skip
+    // both, 0 is not possible at this point.
+    vector<int> count(BSize + 2, 0);
     for (int i = 0; i < BSize; i++) {
       for (int j = 0; j < BSize; j++) {
         if (!isStart and Board[i][j] > 1)
@@ -190,6 +208,37 @@ public:
         MinSz = count[i];
       }
     }
+
+    vector<int> candiateIslands;
+    for (int i = 2; i < BSize + 2; i++) {
+      if (count[i] == MinSz)
+        candiateIslands.push_back(i);
+    }
+    if (candiateIslands.size() == 1)
+      island = candiateIslands[0];
+    else if (candiateIslands.size() > 1) {
+
+      // TODO : If there are multiple Island that are candidates for the next
+      // most constrained Island, then check if any of them are already filled
+      // with a queen if yes then then such an Island cannot be a candidate for
+      // the next most constrained Island. And if there still are multiple
+      // candidates then choose the most constrained candiate based on the
+      // constraints criteria. The constraint criteria used next would be to
+      // check the number of Interferening Islands to the current Island, and
+      // choose the Island with the most interfering Islands, The reason is when
+      // we place Queen on this Island it will tigthen the constraints for more
+      // number of Islands and thus reducing the number of trails required to
+      // reach the solution.
+      island = candiateIslands[0];
+    }
+
+    // Emsure no Queem is placed on this Island.
+    for (int i = 0; i < BSize; i++)
+      for (int j = 0; j < BSize; j++)
+        if (island == InitalBoard[i][j] and Board[i][j] == QUEEN)
+          assert(false and "Queen placed on an Island that is a candidate for "
+                           "next most constrained Island.");
+
     vector<pair<int, int>> Blob;
     for (int i = 0; i < BSize; i++)
       for (int j = 0; j < BSize; j++)
@@ -239,6 +288,7 @@ public:
 
   bool tryToFillBoard(int &countOfQueensPlaced, pair<int, int> QueenTile) {
     assert(isValidTile(QueenTile) && "Invalid tile!");
+    RecursiveFillingInvokeCount++;
 
     // Place the queen.
     int x = QueenTile.first;
@@ -340,6 +390,8 @@ public:
     // next placement of prior queens.
     vector<pair<int, int>> InitalIsland = getNextMostConstrainedIsland(true);
     Fill(InitalIsland);
+    cout << "RecursiveFillingInvokeCount : " << RecursiveFillingInvokeCount
+         << "\n";
   }
 };
 
