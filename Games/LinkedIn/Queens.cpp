@@ -15,6 +15,8 @@ enum Colors {
   PINK
 }; // 1 is the queen.
 enum { QUEEN = 1 };
+// STATSICS
+bool EnableStats = true;
 unsigned long long int RecursiveFillingInvokeCount = 0;
 
 class Queens {
@@ -232,6 +234,10 @@ public:
       island = candiateIslands[0];
     }
 
+    // No canidate Island found, So this must not lead to a valid solution.
+    if(island == -1)
+      return {};
+
     // Emsure no Queem is placed on this Island.
     for (int i = 0; i < BSize; i++)
       for (int j = 0; j < BSize; j++)
@@ -390,11 +396,15 @@ public:
     // next placement of prior queens.
     vector<pair<int, int>> InitalIsland = getNextMostConstrainedIsland(true);
     Fill(InitalIsland);
-    cout << "RecursiveFillingInvokeCount : " << RecursiveFillingInvokeCount
-         << "\n";
+    if (EnableStats){
+      cout<<"\n\n STATISTICS : \n";
+      cout << "\nRecursiveFillingInvokeCount : " << RecursiveFillingInvokeCount
+           << "\n";
+    }
   }
 };
 
+// TODO : Try to generate the board with random Islands and then try to solve.
 int main() {
   Queens B(9);
   B.start();
