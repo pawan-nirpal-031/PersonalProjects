@@ -4,6 +4,7 @@
 #include <vector>
 using namespace std;
 
+// TODO : generatee colours as per Board Size. 
 enum Colors {
   RED = 2,
   BLUE,
@@ -198,7 +199,7 @@ public:
           continue;
         int cx = i + x;
         int cy = i + y;
-        if (Board[cy][cy] == -1)
+        if (Board[cx][cy] == -1)
           continue;
         if (VisitedLands.find(Board[cx][cy]) != VisitedLands.end())
           continue;
@@ -319,18 +320,7 @@ public:
           count[Board[i][j]] += 1;
       }
     }
-    if (tuneStrategy) {
-      STRATEGY strategy = RANDOM;
-      if (strategy == RANDOM) {
-        int randomIsland = rand() % BSize + 2;
-        vector<pair<int, int>> Blob;
-        for (int i = 0; i < BSize; i++)
-          for (int j = 0; j < BSize; j++)
-            if (Board[i][j] == randomIsland)
-              Blob.push_back({i, j});
-        return Blob;
-      }
-    }
+
     int island = -1;
     int MinSz = 1000000;
     for (int i = 2; i < BSize + 2; i++) {
@@ -494,7 +484,6 @@ public:
     for (auto cord : InitalIsland) {
       int x = cord.first;
       int y = cord.second;
-      int InitCol = Board[x][y];
       int countOfQueensPlaced = 0;
       if (tryToFillBoard(countOfQueensPlaced, cord)) {
         verifyBoard();
